@@ -4084,7 +4084,7 @@ packages:
 - pypi: ./
   name: pkoffee
   version: 0.1.0
-  sha256: 4b96be47cb726bf3ab64d8c67fde837dfdeff143d3a4ae88016c6939e49b044b
+  sha256: 8e9e1cbc3a6d40f70d2cbf5b4c18c5984a67cf1b460ba1486ae35b0e5a2d58e0
   requires_dist:
   - numpy>=1.20.0
   - pandas>=1.3.0
