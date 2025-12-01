@@ -1,0 +1,42 @@
+name: Test with Pixi
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Pixi
+      uses: prefix-dev/setup-pixi@v0.8.1
+      with:
+        pixi-version: v0.34.0
+        cache: true
+        cache-write: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
+
+    - name: Run tests
+      run: pixi run test
+
+    - name: Run tests with coverage
+      run: pixi run test-cov
+
+    - name: Type checking
+      run: pixi run typecheck
+      continue-on-error: true
+
+    - name: Linting
+      run: pixi run lint
+      continue-on-error: true
