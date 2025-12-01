@@ -87,13 +87,17 @@ pkoffee-sol/
 
 ```bash
 # Run tests
-pytest tests/
+pixi run test
+
+# Test coverage
+pixi run test-cov
 
 # Type checking
-mypy pkoffee/
+pixi run typecheck
 
 # Linting
-ruff check pkoffee/
+pixi run lint
+pixi run format
 ```
 
 ## License
