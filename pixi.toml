@@ -1,0 +1,123 @@
+[workspace]
+channels = [
+    "https://prefix.dev/pixi-build-backends",
+    "https://prefix.dev/conda-forge",
+]
+platforms = ["linux-64", "osx-64", "osx-arm64"]
+preview = ["pixi-build"]
+
+[workspace.build-variants]
+python = ["3.12.*", "3.13.*", "3.14.*"]
+
+[dependencies]
+pkoffe = { path = "." }
+
+[package]
+name = "pkoffe"
+version = "0.1.0"
+authors = [
+    "Thomas Vuillaume <thomas.vuillaume@lapp.in2p3.fr>",
+    "Vincent Pollet <vincent.pollet@lapp.in2p3.fr>",
+]
+description = "Example pixi project"
+license = "MIT"
+homepage = "https://github.com/s3-school/draft-project"
+repository = "https://github.com/s3-school/draft-project"
+documentation = "https://github.com/s3-school/draft-project/blob/main/README.md"
+
+[package.build]
+backend = { name = "pixi-build-python", version = ">=0.4.1,<5.0.0" }
+
+[package.build.config]
+
+[package.build-dependencies]
+
+[package.host-dependencies]
+# pixi build back-end calls uv or pip with "no-build-isolation" so build tools need to be available
+# setuptools and other build tools should be host dependencies for now, see https://pixi.sh/latest/build/dependency_types/#python-code
+uv = ">=0.9.9,<0.10.0"
+uv-build = ">=0.9.9,<0.10.0"
+
+[package.run-dependencies]
+python = "*"
+numpy = ">=2.3.5,<3"
+pandas = ">=2.3.3,<3"
+scipy = ">=1.16.3,<2"
+matplotlib-base = ">=3.10.8,<4"
+seaborn = ">=0.13.2,<0.14"
+
+# A feature per-python version to test the build-variants
+[feature.py312.dependencies]
+python=">=3.12,<3.13"
+
+[feature.py313.dependencies]
+python=">=3.13,<3.14"
+
+[feature.py314.dependencies]
+python=">=3.14,<3.15"
+
+[feature.test.dependencies]
+# example task converts notebooks to markdown to include so they can be included in documentation
+nbconvert = ">=7.16.6,<8"
+pytest = ">=9,<10"
+pytest-cov = ">=7,<8"
+
+[feature.test.tasks.test]
+args = [
+    { "arg" = "coverage_dir", "default" = "htmlcov" },
+    { "arg" = "cobertura_report", "default" = "cobertura_report.xml" },
+    { "arg" = "junit_report", "default" = "junit_report.xml"}
+]
+cmd = "pytest -vv --cov-report=html:{{ coverage_dir }} --cov-report=xml:{{ cobertura_report }} --junitxml={{ junit_report }}"
+
+[feature.test.tasks.run_on_snippets]
+args = [{ "arg" = "name_match" }, { "arg" = "run_cmd" }, { "arg" = "snippets_dir" }]
+cmd = "cd {{ snippets_dir }} && find . -maxdepth 1 -type f -name {{ name_match }} -exec {{ run_cmd }} '{}' ';'"
+
+[feature.test.tasks.example]
+args = [{ "arg" = "snippets_dir", "default" = "doc/doc_src/snippets" }]
+depends-on = [{"task" = "run_on_snippets", "args" = ["*.ipynb", "jupyter nbconvert --to markdown --execute", "{{ snippets_dir }}",]},
+              {"task" = "run_on_snippets", "args" = ["*.py", "python", "{{ snippets_dir }}",]},
+]
+
+[feature.dev.dependencies]
+jupyterlab = ">=4.4.3,<5"
+ruff = ">=0.14,<0.15"
+
+[feature.dev.tasks]
+format = "ruff format"
+check = "ruff check"
+
+[feature.doc.dependencies]
+mkdocstrings-python = ">=2.0.0,<3"
+mkdocs-material = ">=9.6.14,<10" # material brings mkdocs, markdown and pymdown-extension
+
+[feature.doc.pypi-dependencies]
+mkdocs-api-autonav = ">=0.4.0, <0.5" # automatically generate documentation for full package
+
+# Doc task requires to run example task before (to convert the notebooks to markdown and execute scripts to verify their validity
+# however the doc task doesn't depend on the example task, because in CI they typically run in different jobs
+[feature.doc.tasks.doc]
+args = [{"arg" = "docDir", default="htmldoc"}]
+cmd = [
+    "cp", "-r", "doc/images", "doc/doc_src/doc/images", "&&", # copy the images included in readme (included in doc) in doc source folder because mkdocs can not include files outside of src folder
+    "mkdocs", "build", "--strict", "--clean", "-f", "doc/mkdocs.yml", "-d", "../{{ docDir }}"
+]
+
+[environments]
+prod = { features = ["py313"], solve-group = "prod" }
+test = { features = ["test", "py313"], solve-group = "prod" }
+# use default for the dev environment so tasks are resolved in this environment (avoids having to specify env)
+# no need to include doc: pixi will figure the environment to use from the task if it is unique
+default = { features = ["dev", "test", "py313"], solve-group = "prod" }
+
+# python 3.14 environments for testing
+prod314 = { features = ["py314"], solve-group = "prod314" }
+testpy314 = { features = ["test", "py314"] }
+
+# python 3.12 environments for testing
+prod312 = { features = ["py312"], solve-group = "prod312" }
+testpy312 = {features = ["test", "py312"] }
+
+# Doc environment only contains documentation tools, not the package dependencies
+doc = { features = ["doc"], no-default-feature = true }
