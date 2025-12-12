@@ -56,7 +56,7 @@ def test_fit_model_success() -> None:
 
 
 def test_fit_model_failure() -> None:
-    """Test that fit_model returns None on failure."""
+    """Test that fit_model raises error on failure."""
     x = np.array([1.0, 2.0, 3.0])
     y = np.array([1.0, 2.0, 3.0])
 
@@ -68,7 +68,8 @@ def test_fit_model_failure() -> None:
         bounds=ParametersBounds(min=(dt(-100.0),), max=(dt(-1.0),)),
     )
 
-    with pytest.raises(ValueError):  # noqa: PT011 error raised by scipy
+    # Verify value error is raised, ignore RuntimeWarning from sqrt(0)
+    with pytest.raises(ValueError), pytest.warns(RuntimeWarning):  # noqa: PT011 error raised by scipy
         _ = fit_model(x, y, config)
 
 
