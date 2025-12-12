@@ -1,6 +1,6 @@
 # PKoffee - Coffee Productivity Analysis
 
-A Python package for analyzing the relationship between coffee consumption and productivity through statistical modeling and visualization.
+A Conda package implemented in python for analyzing the relationship between coffee consumption and productivity through statistical modeling and visualization.
 
 Project inspired by _Le Café - Oldelaf_ for the S3 School 2026.
 
@@ -17,27 +17,26 @@ Project inspired by _Le Café - Oldelaf_ for the S3 School 2026.
 
 ## Installation
 
-
-
 ```bash
-pip install -e .
+pixi install
 ```
 
 ## Quick Start
 
 ```python
-from pkoffee.data import load_data
-from pkoffee.models import fit_all_models
-from pkoffee.visualization import create_analysis_plot
+from pathlib import Path
+from pkoffee.data import load_csv
+from pkoffee.productivity_analysis import fit_all_models
+from pkoffee.visualization import plot_models
 
 # Load your data
-data = load_data("coffee_productivity.csv")
+data = load_csv(Path("coffee_productivity.csv"))
 
 # Fit models
 fitted_models = fit_all_models(data)
 
 # Create visualization
-create_analysis_plot(data, fitted_models, output_path="results.png")
+plot_models(data, fitted_models, output_path="results.png")
 ```
 
 ## Command Line Interface
@@ -45,32 +44,38 @@ create_analysis_plot(data, fitted_models, output_path="results.png")
 ```bash
 # Analyze
 cd analysis
-pkoffee-sol analyze coffee_productivity.csv --output analysis.png
+pkoffee analyze --data-file coffee_productivity.csv --output analysis.png
 ```
 
 # View model rankings
 
-```
+```bash
 cd analysis
-pkoffee-sol analyze coffee_productivity.csv --show-rankings
+pkoffee-sol analyze --data-file coffee_productivity.csv --show-rankings
 ```
 
 ## Project Structure
 
 ```
 pkoffee-sol/
-├── pkoffee/
-│   ├── __init__.py          # Package initialization
-│   ├── data.py              # Data loading utilities
-│   ├── models.py            # Mathematical models and fitting
-│   ├── metrics.py           # Model evaluation metrics
-│   ├── visualization.py     # Plotting functions
-│   └── cli.py               # Command-line interface
+├── src/pkoffee/
+│   ├── __init__.py               # Python package
+│   ├── cli.py                    # Command line interface
+│   ├── data.py                   # Data loading utilities
+│   ├── fit_models.py             # Model definition and fitting
+│   ├── log.py                    # Logging utilities
+│   ├── metrics.py                # Model evaluation metrics
+│   ├── parametric_function.py    # Mathematical models as parametric functions
+│   ├── productivity_analysis.py  # Coffee analysis
+│   └── visualization.py          # Plotting functions
 ├── tests/
 │   ├── test_data.py
-│   ├── test_models.py
-│   └── test_metrics.py
+│   ├── test_fit_models.py
+│   ├── test_metrics.py
+│   └── test_parametric_function.py
 ├── README.md
+├── pixi.toml
+├── pixi.lock
 ├── pyproject.toml
 └── setup.py
 ```
@@ -88,12 +93,6 @@ pkoffee-sol/
 ```bash
 # Run tests
 pixi run test
-
-# Test coverage
-pixi run test-cov
-
-# Type checking
-pixi run typecheck
 
 # Linting
 pixi run lint
