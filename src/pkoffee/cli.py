@@ -67,8 +67,8 @@ Examples:
         formatter_class=PKoffeArgParseFormatter,
     )
     analyze_parser.add_argument(
-        "data-file",
-        type=str,
+        "--data-file",
+        type=Path,
         dest="data_file",
         help="Path to CSV file with 'cups' and 'productivity' columns",
     )

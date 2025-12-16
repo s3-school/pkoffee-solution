@@ -96,8 +96,8 @@ def analyze(args: argparse.Namespace) -> None:
         plot_models(
             data,
             models,
-            FigureParameters(y_limits=y_limits, dpi=args.dpi),
             output_path=args.output,
+            fig_params=FigureParameters(y_limits=y_limits, dpi=args.dpi),
             show=Show.YES if args.no_show else Show.NO,
         )
 
@@ -107,8 +107,8 @@ def analyze(args: argparse.Namespace) -> None:
         create_comparison_plot(
             data,
             models,
-            FigureParameters(dpi=args.dpi),
             output_path=args.comparison,
+            fig_params=FigureParameters(dpi=args.dpi),
             show=Show.YES if args.no_show else Show.NO,
         )
 
