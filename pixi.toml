@@ -21,9 +21,9 @@ authors = [
 ]
 description = "Example pixi project"
 license = "MIT"
-homepage = "https://github.com/s3-school/draft-project"
-repository = "https://github.com/s3-school/draft-project"
-documentation = "https://github.com/s3-school/draft-project/blob/main/README.md"
+homepage = "https://github.com/s3-school/pkoffee-solution"
+repository = "https://github.com/s3-school/pkoffee-solution"
+documentation = "https://github.com/s3-school/pkoffee-solution/blob/main/README.md"
 
 [package.build]
 backend = { name = "pixi-build-python", version = ">=0.4.1,<5.0.0" }

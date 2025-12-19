@@ -24,9 +24,9 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/s3-school/draft-project"
-"Bug Tracker" = "https://github.com/s3-school/draft-project/issues"
-"Documentation" = "https://github.com/s3-school/draft-project/blob/main/README.md"
+"Homepage" = "https://github.com/s3-school/pkoffee-solution"
+"Bug Tracker" = "https://github.com/s3-school/pkoffee-solution/issues"
+"Documentation" = "https://github.com/s3-school/pkoffee-solution/blob/main/README.md"
 
 [project.scripts]
 pkoffee = "pkoffee.cli:main"
