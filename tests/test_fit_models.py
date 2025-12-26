@@ -1,27 +1,78 @@
-"""Unit tests for models and fitting."""
+"""Unit tests for model fitting."""
 
 import numpy as np
 import pytest
 
+from pkoffee.data import AnyShapeDataDtypeArray, neg_inf, pos_inf
 from pkoffee.data import data_dtype as dt
 from pkoffee.fit_models import (
     Model,
-    ParametersBounds,
     fit_model,
 )
+from pkoffee.parametric_function import ParametersBounds
+
+
+class Linear:
+    """Linear function."""
+
+    def __call__(self, x: AnyShapeDataDtypeArray, a: dt, b: dt) -> AnyShapeDataDtypeArray:
+        """Evaluate y = a * x + b."""
+        return a * x + b  # pyright: ignore[reportReturnType] return dtype is data_dtype alright.
+
+    @staticmethod
+    def param_guess() -> dict[str, dt]:
+        """Guess parameters for tests: a: 2.0, b: 1.0."""
+        return {"a": dt(2.0), "b": dt(1.0)}
+
+    @staticmethod
+    def param_bounds() -> ParametersBounds:
+        """Parameter bounds in [-inf, +inf]."""
+        return ParametersBounds(min={"a": neg_inf, "b": neg_inf}, max={"a": pos_inf, "b": pos_inf})
+
+
+class LinearSQRT:
+    """Passthrough model with square root of coefficient parameter."""
+
+    def __call__(self, x: AnyShapeDataDtypeArray, a: dt) -> AnyShapeDataDtypeArray:
+        """Evaluate y = sqrt(a) * x."""
+        return np.sqrt(a) * x
+
+    @staticmethod
+    def param_guess() -> dict[str, dt]:
+        """Guess parameter: a: 1.0."""
+        return {"a": dt(1.0)}
+
+    @staticmethod
+    def param_bounds() -> ParametersBounds:
+        """Parameter bounds: "a" should be positive."""
+        return ParametersBounds(min={"a": dt(5e-7)}, max={"a": pos_inf})
+
+
+class PassThrough:
+    """PassThrough empty model for testing."""
+
+    def __call__(self, x: AnyShapeDataDtypeArray) -> AnyShapeDataDtypeArray:
+        """Passthrough."""
+        return x
+
+    @staticmethod
+    def param_guess() -> dict[str, dt]:
+        """No parameter to guess."""
+        return {}
+
+    @staticmethod
+    def param_bounds() -> ParametersBounds:
+        """No parameter bounds."""
+        return ParametersBounds(min={}, max={})
 
 
 def test_model_result_predict() -> None:
     """Test ModelResult prediction method."""
-
-    def simple_model(x: np.ndarray, m: float, b: float) -> np.ndarray:
-        return m * x + b
-
     model_result = Model(
         name="Linear",
-        function=simple_model,
-        params={"m": dt(2.0), "b": dt(1.0)},
-        bounds=ParametersBounds(min=(dt(-10), dt(10)), max=(dt(-100), dt(100))),
+        function=Linear(),
+        params=Linear.param_guess(),
+        bounds=Linear.param_bounds(),
         r_squared=dt(0.95),
     )
 
@@ -41,9 +92,9 @@ def test_fit_model_success() -> None:
 
     lin_model = Model(
         name="Test Linear",
-        function=lambda xx, a, b: a * xx + b,
+        function=Linear(),
         params={"a": dt(1.0), "b": dt(0.0)},
-        bounds=ParametersBounds(min=(dt(-np.inf),), max=(dt(np.inf),)),
+        bounds=ParametersBounds(min=dict.fromkeys(["a", "b"], neg_inf), max=dict.fromkeys(["a", "b"], pos_inf)),
     )
 
     result, _ = fit_model(x, y, lin_model)
@@ -63,9 +114,9 @@ def test_fit_model_failure() -> None:
     # Create a config that will fail
     config = Model(
         name="Bad Model",
-        function=lambda xx, a: np.sqrt(a) * xx,
+        function=LinearSQRT(),
         params={"a": dt(-10.0)},
-        bounds=ParametersBounds(min=(dt(-100.0),), max=(dt(-1.0),)),
+        bounds=ParametersBounds(min={"a": dt(-100.0)}, max={"a": dt(-1.0)}),
     )
 
     # Verify value error is raised, ignore RuntimeWarning from sqrt(0)
@@ -77,10 +128,10 @@ def test_model_result_repr() -> None:
     """Test ModelResult string representation."""
     model = Model(
         name="TestModel",
-        function=lambda x: x,
+        function=PassThrough(),
         params={},
         r_squared=dt(0.8765),
-        bounds=ParametersBounds((dt(0),), (dt(1),)),
+        bounds=ParametersBounds({}, {}),
     )
 
     repr_str = repr(model)
@@ -95,17 +146,17 @@ def test_model_sort() -> None:
     model_list = [
         Model(
             name="a",
-            function=lambda x: x,
+            function=PassThrough(),
             params={},
             r_squared=r_squared_max,
-            bounds=ParametersBounds(min=(dt(0),), max=(dt(10.0),)),
+            bounds=ParametersBounds({}, {}),
         ),
         Model(
             name="b",
-            function=lambda x: x,
+            function=PassThrough(),
             params={},
             r_squared=r_squared_min,
-            bounds=ParametersBounds(min=(dt(0),), max=(dt(10.0),)),
+            bounds=ParametersBounds({}, {}),
         ),
     ]
     Model.sort(model_list)

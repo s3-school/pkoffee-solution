@@ -41,9 +41,9 @@ uv-build = ">=0.9.9,<0.10.0"
 [package.run-dependencies]
 python = "*"
 numpy = ">=2.3.5,<3"
+matplotlib-base = ">=3.10.8,<4"
 pandas = ">=2.3.3,<3"
 scipy = ">=1.16.3,<2"
-matplotlib-base = ">=3.10.8,<4"
 seaborn = ">=0.13.2,<0.14"
 
 # A feature per-python version to test the build-variants

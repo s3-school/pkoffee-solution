@@ -5,7 +5,7 @@ coffee consumption vs productivity data.
 """
 
 from dataclasses import dataclass
-from typing import NamedTuple, Self
+from typing import Self
 
 import numpy as np
 from scipy.optimize import curve_fit
@@ -13,28 +13,14 @@ from scipy.optimize import curve_fit
 from pkoffee.data import data_dtype
 from pkoffee.metrics import compute_r2
 from pkoffee.parametric_function import (
-    ParamFunctionType,
-    logistic,
-    michaelis_menten_saturation,
-    peak2_model,
-    peak_model,
-    quadratic,
+    Logistic,
+    MichaelisMentenSaturation,
+    ParametersBounds,
+    ParametricFunction,
+    Peak2Model,
+    PeakModel,
+    Quadratic,
 )
-
-
-class ParametersBounds(NamedTuple):
-    """Store the minimum and maximum bound of a model parameter's values.
-
-    Attributes
-    ----------
-    min : tuple[pkoffe_data_type, ...]
-        Minimum bound for the model parameters
-    max : tuple[pkoffe_data_type, ...]
-        Maximum bound for the model parameters
-    """
-
-    min: tuple[data_dtype, ...]
-    max: tuple[data_dtype, ...]
 
 
 @dataclass
@@ -54,7 +40,7 @@ class Model:
     """
 
     name: str
-    function: ParamFunctionType
+    function: ParametricFunction
     params: dict[str, data_dtype]
     bounds: ParametersBounds
     r_squared: data_dtype = -data_dtype(np.inf)
@@ -110,42 +96,37 @@ def default_models(x: np.ndarray, y: np.ndarray) -> list[Model]:
     """
     x_min, x_max = np.min(x), np.max(x)
     y_min, y_max = np.min(y), np.max(y)
-    y_range = max(data_dtype(1e-8), y_max - y_min)
-    x_mid = 0.5 * (x_min + x_max)
-
-    inf = data_dtype(np.inf)
-    zero = data_dtype(0.0)
 
     return [
         Model(
             name="Quadratic",
-            function=quadratic,
-            params={"a0": y_min, "a1": data_dtype(0.0), "a2": data_dtype(0.01)},
-            bounds=ParametersBounds(min=(-inf,), max=(inf,)),
+            function=Quadratic(),
+            params=Quadratic.param_guess(y_min=y_min),
+            bounds=Quadratic.param_bounds(),
         ),
         Model(
             name="Michaelis-Menten",
-            function=michaelis_menten_saturation,
-            params={"v_max": y_range, "k": max(1.0, 0.2 * (x_min + x_max)), "y0": y_min},
-            bounds=ParametersBounds(min=(-inf, zero, -inf), max=(inf, inf, inf)),
+            function=MichaelisMentenSaturation(),
+            params=MichaelisMentenSaturation.param_guess(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max),
+            bounds=MichaelisMentenSaturation.param_bounds(),
         ),
         Model(
             name="Logistic",
-            function=logistic,
-            params={"L": y_range, "k": data_dtype(0.5), "x0": x_mid, "y0": y_min},
-            bounds=ParametersBounds(min=(-inf, zero, -inf, -inf), max=(inf, inf, inf, inf)),
+            function=Logistic(),
+            params=Logistic.param_guess(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max),
+            bounds=Logistic.param_bounds(),
         ),
         Model(
             name="Peak",
-            function=peak_model,
-            params={"a": max(y_min, y_max), "b": max(1.0, x_mid)},
-            bounds=ParametersBounds(min=(-inf, zero), max=(inf, inf)),
+            function=PeakModel(),
+            params=PeakModel.param_guess(x_min=x_min, x_max=x_max, y_max=y_max),
+            bounds=PeakModel.param_bounds(),
         ),
         Model(
             name="Peak²",
-            function=peak2_model,
-            params={"a": max(1e-6, y_max / max(1.0, x_max**2)), "b": max(1.0, x_mid)},
-            bounds=ParametersBounds(min=(-inf, zero), max=(inf, inf)),
+            function=Peak2Model(),
+            params=Peak2Model.param_guess(x_min=x_min, x_max=x_max, y_max=y_max),
+            bounds=Peak2Model.param_bounds(),
         ),
     ]
 
@@ -181,12 +162,16 @@ def fit_model(
     RuntimeError
         If the least-squares minimization fails.
     """
+    params = model.params.keys()
     optimal_params, _ = curve_fit(
         model.function,
         x,
         y,
-        p0=list(model.params.values()),
-        bounds=model.bounds,
+        p0=list(model.params.values()),  # same order as params
+        bounds=(
+            tuple(model.bounds.min[p] for p in params),
+            tuple(model.bounds.max[p] for p in params),
+        ),  # converting to tuples while respecting params order
         maxfev=max_iterations,
     )
     predictions = model.function(x, *optimal_params)
