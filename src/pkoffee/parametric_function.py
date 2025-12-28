@@ -4,7 +4,7 @@ This module provides functions with signature f(x, *args, **kwargs), where `x` i
 arguments are the function parameters. Functions also provide guesses and boundaries for parameter values.
 """
 
-from typing import NamedTuple, ParamSpec, Protocol
+from typing import NamedTuple, ParamSpec, Protocol, runtime_checkable
 
 import numpy as np
 
@@ -30,6 +30,7 @@ AnyDataDtypeArgsKwargs = ParamSpec("AnyDataDtypeArgsKwargs", bound=data_dtype)  
 AnyArgsKwargs = ParamSpec("AnyArgsKwargs")
 
 
+@runtime_checkable
 class ParametricFunction(Protocol[AnyShapeDataDtypeArray, AnyDataDtypeArgsKwargs, AnyArgsKwargs]):
     """Parametric function API."""
 

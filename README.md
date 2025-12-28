@@ -62,7 +62,8 @@ pkoffee-sol/
 │   ├── __init__.py               # Python package
 │   ├── cli.py                    # Command line interface
 │   ├── data.py                   # Data loading utilities
-│   ├── fit_models.py             # Model definition and fitting
+│   ├── fit_model.py              # Model definition and fitting
+│   ├── fit_model_io.py           # Model writing/reading to file
 │   ├── log.py                    # Logging utilities
 │   ├── metrics.py                # Model evaluation metrics
 │   ├── parametric_function.py    # Mathematical models as parametric functions
@@ -70,7 +71,8 @@ pkoffee-sol/
 │   └── visualization.py          # Plotting functions
 ├── tests/
 │   ├── test_data.py
-│   ├── test_fit_models.py
+│   ├── test_fit_model.py
+│   ├── test_fit_model_io.py
 │   ├── test_metrics.py
 │   └── test_parametric_function.py
 ├── README.md

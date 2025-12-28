@@ -39,12 +39,14 @@ uv = ">=0.9.9,<0.10.0"
 uv-build = ">=0.9.9,<0.10.0"
 
 [package.run-dependencies]
+bidict = ">=0.23.1,<1"
 python = "*"
 numpy = ">=2.3.5,<3"
 matplotlib-base = ">=3.10.8,<4"
 pandas = ">=2.3.3,<3"
 scipy = ">=1.16.3,<2"
 seaborn = ">=0.13.2,<0.14"
+tomlkit = ">=0.13.3,<1"
 
 # A feature per-python version to test the build-variants
 [feature.py312.dependencies]

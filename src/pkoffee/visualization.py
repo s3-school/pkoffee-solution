@@ -14,7 +14,7 @@ from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
 
 from pkoffee.data import RequiredColumn, data_dtype
-from pkoffee.fit_models import Model
+from pkoffee.fit_model import Model
 
 
 class Show(Enum):

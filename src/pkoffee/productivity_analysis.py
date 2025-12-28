@@ -7,8 +7,61 @@ import numpy as np
 import pandas as pd
 
 from pkoffee.data import RequiredColumn, data_dtype, extract_arrays, load_csv
-from pkoffee.fit_models import Model, default_models, fit_model
+from pkoffee.fit_model import Model, fit_model
+from pkoffee.parametric_function import Logistic, MichaelisMentenSaturation, Peak2Model, PeakModel, Quadratic
 from pkoffee.visualization import FigureParameters, Show, create_comparison_plot, format_model_rankings, plot_models
+
+
+def default_models(x: np.ndarray, y: np.ndarray) -> list[Model]:
+    """Generate model configurations with suited initial parameter guesses.
+
+    Parameters
+    ----------
+    x : np.ndarray
+        Input data (cups).
+    y : np.ndarray
+        Output data (productivity).
+
+    Returns
+    -------
+    list[Model]
+        List of model configurations ready for fitting.
+    """
+    x_min, x_max = np.min(x), np.max(x)
+    y_min, y_max = np.min(y), np.max(y)
+
+    return [
+        Model(
+            name="Quadratic",
+            function=Quadratic(),
+            params=Quadratic.param_guess(y_min=y_min),
+            bounds=Quadratic.param_bounds(),
+        ),
+        Model(
+            name="Michaelis-Menten",
+            function=MichaelisMentenSaturation(),
+            params=MichaelisMentenSaturation.param_guess(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max),
+            bounds=MichaelisMentenSaturation.param_bounds(),
+        ),
+        Model(
+            name="Logistic",
+            function=Logistic(),
+            params=Logistic.param_guess(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max),
+            bounds=Logistic.param_bounds(),
+        ),
+        Model(
+            name="Peak",
+            function=PeakModel(),
+            params=PeakModel.param_guess(x_min=x_min, x_max=x_max, y_max=y_max),
+            bounds=PeakModel.param_bounds(),
+        ),
+        Model(
+            name="Peak²",
+            function=Peak2Model(),
+            params=Peak2Model.param_guess(x_min=x_min, x_max=x_max, y_max=y_max),
+            bounds=Peak2Model.param_bounds(),
+        ),
+    ]
 
 
 def fit_all_models(

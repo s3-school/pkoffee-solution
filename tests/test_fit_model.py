@@ -5,10 +5,11 @@ import pytest
 
 from pkoffee.data import AnyShapeDataDtypeArray, neg_inf, pos_inf
 from pkoffee.data import data_dtype as dt
-from pkoffee.fit_models import (
+from pkoffee.fit_model import (
     Model,
     fit_model,
 )
+from pkoffee.fit_model_io import FunctionIdNotFoundInMappingError, FunctionNotFoundInMappingError, ModelParsingError
 from pkoffee.parametric_function import ParametersBounds
 
 
@@ -162,3 +163,72 @@ def test_model_sort() -> None:
     Model.sort(model_list)
     assert model_list[0].r_squared == r_squared_max
     assert model_list[1].r_squared == r_squared_min
+
+
+def test_model_to_dict() -> None:
+    """Test model conversion to dictionary."""
+    linear_model = Model(
+        name="test_linear",
+        function=Linear(),
+        params={"a": dt(1.0), "b": dt(0.5)},
+        bounds=ParametersBounds(min={"a": dt(-1.0), "b": dt(-5.0)}, max={"a": dt(1.0), "b": dt(5.0)}),
+        r_squared=dt(0.2),
+    )
+    assert linear_model.to_dict({Linear: "Linear"}) == {
+        "name": "test_linear",
+        "function": "Linear",
+        "params": {"a": 1.0, "b": 0.5},
+        "bounds": {"min": {"a": -1.0, "b": -5.0}, "max": {"a": 1.0, "b": 5.0}},
+        "r_squared": 0.20000000298023224,
+    }
+
+
+def test_model_to_dict_missing_mapping() -> None:
+    """Test Error raising when function mapping is missing during dict conversion."""
+    model = Model(
+        name="Passthrough",
+        function=PassThrough(),
+        params={},
+        bounds=ParametersBounds(min={}, max={}),
+        r_squared=neg_inf,
+    )
+    with pytest.raises(FunctionNotFoundInMappingError):
+        model.to_dict({})
+
+
+def test_model_from_dict() -> None:
+    """Test model creation from dictionary."""
+    d = {
+        "name": "test_linear",
+        "function": "Linear",
+        "params": {"a": 1.0, "b": 0.5},
+        "bounds": {"min": {"a": -1.0, "b": -5.0}, "max": {"a": 1.0, "b": 5.0}},
+        "r_squared": 0.20000000298023224,
+    }
+    linear_model = Model.from_dict(d, {"Linear": Linear})
+    assert linear_model.name == d["name"]
+    assert isinstance(linear_model.function, Linear)
+    assert linear_model.params == {p: dt(v) for p, v in d["params"].items()}
+    assert linear_model.bounds == ParametersBounds(
+        min={p: dt(v) for p, v in d["bounds"]["min"].items()}, max={p: dt(v) for p, v in d["bounds"]["max"].items()}
+    )
+    assert linear_model.r_squared == d["r_squared"]
+
+
+def test_model_from_dict_missing_mapping() -> None:
+    """Test model creation from dictionary error in case of missing mapping."""
+    d = {
+        "name": "passthrough",
+        "function": "PassThrough",
+        "params": {},
+        "bounds": {"min": {}, "max": {}},
+        "r_squared": neg_inf,
+    }
+    with pytest.raises(FunctionIdNotFoundInMappingError):
+        Model.from_dict(d, {})
+
+
+def test_model_from_dict_bad_dict() -> None:
+    """Test model creation error when the dictionary doesn't have the required content."""
+    with pytest.raises(ModelParsingError):
+        Model.from_dict({}, {})
