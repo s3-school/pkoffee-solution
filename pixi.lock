@@ -12467,7 +12467,7 @@ packages:
   - seaborn >=0.13.2,<0.14
   license: MIT
   input:
-    hash: a0a37cccc62e27701c8b62a02ac5540602a7bf6a12fc467c9d736fa2c83b7b8c
+    hash: 34a60cfcf13afc2bddb4832c320bbd47506aaac4a8942957891b18ca6470ff39
     globs:
     - recipe.yml
     - variants.yaml
@@ -12491,7 +12491,7 @@ packages:
   - tomlkit >=0.13.3,<1
   license: MIT
   input:
-    hash: a0a37cccc62e27701c8b62a02ac5540602a7bf6a12fc467c9d736fa2c83b7b8c
+    hash: 34a60cfcf13afc2bddb4832c320bbd47506aaac4a8942957891b18ca6470ff39
     globs:
     - recipe.yml
     - variants.yaml

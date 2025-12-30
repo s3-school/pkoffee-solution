@@ -21,7 +21,7 @@ outputs:
     build: 
       number: 0
       script:
-        - uv pip install --python "$PREFIX/bin/python" -vv --no-deps --no-build-isolation .
+        - uv pip install --python ${{ PYTHON }} -vv --no-deps --no-build-isolation .
     requirements:
       host:
         - python >=3.12,<3.15
