@@ -7,45 +7,22 @@ package. This mapping can be extended with additional functions to save other mo
 """
 
 import json
-import typing
 from collections.abc import Iterable, Mapping
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
+import tomlkit
 from bidict import bidict
 from tomlkit import aot, document, item
 
-if typing.TYPE_CHECKING:
-    from pkoffee.fit_model import Model  # only use Model for type hints of save models functions
+from pkoffee.fit_model import Model
 from pkoffee.parametric_function import (
     Logistic,
     MichaelisMentenSaturation,
-    ParametricFunction,
     Peak2Model,
     PeakModel,
     Quadratic,
 )
-
-
-class FunctionNotFoundInMappingError(KeyError):
-    """Exception when a function is not found in the function to str mapping."""
-
-    def __init__(self, function: type[ParametricFunction], mapping: Mapping) -> None:
-        super().__init__(f"Function {function} not found in function to str mapping {mapping}")
-
-
-class FunctionIdNotFoundInMappingError(KeyError):
-    """Exception when a function Identifier is not found in the function Id to function mapping."""
-
-    def __init__(self, function_id: str, mapping: Mapping) -> None:
-        super().__init__(f"Function Identifier {function_id} not found in mapping to function {mapping}")
-
-
-class ModelParsingError(ValueError):
-    """Exception when a model dictionary representation can not be parsed into a model."""
-
-    def __init__(self, model_dict: Mapping) -> None:
-        super().__init__(f"Could not parse model dictionary {model_dict}, missing fields or bad types?")
 
 
 def pkoffee_function_id_mapping() -> bidict:
@@ -68,11 +45,35 @@ class UnsupportedModelFormatError(NotImplementedError):
         super().__init__(f"Model format {file_format} not supported. See ModelFileFormat.")
 
 
-class ModelFileFormat(Enum):
+class ModelFileFormat(StrEnum):
     """Available format for saving models to file."""
 
-    TOML = 1
-    JSON = 2
+    TOML = "toml"
+    JSON = "json"
+
+
+def file_format_from_path(file_path: Path) -> ModelFileFormat:
+    """Determine models's file format from a file path extension.
+
+    Parameters
+    ----------
+    file_path : Path
+        Path to a file, eg "model.toml"
+
+    Returns
+    -------
+    ModelFileFormat
+        File format
+
+    Raises
+    ------
+    UnsupportedModelFormatError
+        If the file format is not supported
+    """
+    try:
+        return ModelFileFormat(file_path.suffix[1:])  # remove '.' from suffix
+    except KeyError as e:
+        raise UnsupportedModelFormatError(file_path.suffix) from e
 
 
 def save_models_json(model_dicts: Iterable[dict], output_path: Path) -> None:
@@ -109,7 +110,7 @@ def save_models_toml(model_dicts: Iterable[dict], output_path: Path) -> None:
 
 
 def save_models(
-    models: "Iterable[Model]", function_to_str: Mapping, output_path: Path, file_format: ModelFileFormat
+    models: Iterable[Model], function_to_str: Mapping, output_path: Path, file_format: ModelFileFormat | None = None
 ) -> None:
     """Save the models to disk.
 
@@ -124,6 +125,8 @@ def save_models(
     file_format : ModelFileFormat
         The format of the model's file
     """
+    if file_format is None:
+        file_format = file_format_from_path(output_path)
     model_dicts = [m.to_dict(function_to_str) for m in models]
     match file_format:
         case ModelFileFormat.JSON:
@@ -131,4 +134,74 @@ def save_models(
         case ModelFileFormat.TOML:
             save_models_toml(model_dicts, output_path)
         case _:
-            raise ModuleNotFoundError(str(file_format))
+            raise UnsupportedModelFormatError(str(file_format))
+
+
+def load_models_json(model_file: Path, str_to_function: Mapping) -> list[Model]:
+    """Load models from json file.
+
+    Parameters
+    ----------
+    model_file : Path
+        Path to the models' file
+    str_to_function : Mapping
+        Mapping of function string identifier to function classes
+
+    Returns
+    -------
+    list[Model]
+        Loaded models
+    """
+    with model_file.open("r") as mdlf:
+        models_dict = json.loads(mdlf.read())["Models"]
+    return [Model.from_dict(m_d, str_to_function) for m_d in models_dict]
+
+
+def load_models_toml(model_file: Path, str_to_function: Mapping) -> list[Model]:
+    """Load models from toml file.
+
+    Parameters
+    ----------
+    model_file : Path
+        Path to the models' file
+    str_to_function : Mapping
+        Mapping of function string identifier to function classes
+
+    Returns
+    -------
+    list[Model]
+        Loaded models
+    """
+    with model_file.open("r") as mdlf:
+        models_dict = tomlkit.parse(mdlf.read())["Models"]
+    return [Model.from_dict(m_d, str_to_function) for m_d in models_dict]  # pyright: ignore[reportGeneralTypeIssues] models_dict is iterable alright
+
+
+def load_models(
+    model_file: Path, str_to_function: Mapping, file_format: ModelFileFormat | None = None
+) -> list[Model]:
+    """Load models from file.
+
+    Parameters
+    ----------
+    model_file : Path
+        Path to the model's file
+    str_to_function : Mapping
+        Mapping of function string identifier to function classes
+    file_format : ModelFileFormat
+        Format of the model file
+
+    Returns
+    -------
+    list[Model]
+        Loaded models
+    """
+    if file_format is None:
+        file_format = file_format_from_path(model_file)
+    match file_format:
+        case ModelFileFormat.JSON:
+            return load_models_json(model_file, str_to_function)
+        case ModelFileFormat.TOML:
+            return load_models_toml(model_file, str_to_function)
+        case _:
+            raise UnsupportedModelFormatError(str(file_format))

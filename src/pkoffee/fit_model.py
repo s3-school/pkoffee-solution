@@ -11,13 +11,33 @@ from typing import Self
 import numpy as np
 from scipy.optimize import curve_fit
 
-from pkoffee.data import data_dtype
-from pkoffee.fit_model_io import FunctionIdNotFoundInMappingError, FunctionNotFoundInMappingError, ModelParsingError
+from pkoffee.data import AnyShapeDataDtypeArray, data_dtype
 from pkoffee.metrics import compute_r2
 from pkoffee.parametric_function import (
     ParametersBounds,
     ParametricFunction,
 )
+
+
+class FunctionNotFoundInMappingError(KeyError):
+    """Exception when a function is not found in the function to str mapping."""
+
+    def __init__(self, function: type[ParametricFunction], mapping: Mapping) -> None:
+        super().__init__(f"Function {function} not found in function to str mapping {mapping}")
+
+
+class FunctionIdNotFoundInMappingError(KeyError):
+    """Exception when a function Identifier is not found in the function Id to function mapping."""
+
+    def __init__(self, function_id: str, mapping: Mapping) -> None:
+        super().__init__(f"Function Identifier {function_id} not found in mapping to function {mapping}")
+
+
+class ModelParsingError(ValueError):
+    """Exception when a model dictionary representation can not be parsed into a model."""
+
+    def __init__(self, model_dict: Mapping) -> None:
+        super().__init__(f"Could not parse model dictionary {model_dict}, missing fields or bad types?")
 
 
 @dataclass
@@ -42,7 +62,7 @@ class Model:
     bounds: ParametersBounds
     r_squared: data_dtype = -data_dtype(np.inf)
 
-    def predict(self, x: np.ndarray) -> np.ndarray:
+    def predict(self, x: AnyShapeDataDtypeArray) -> AnyShapeDataDtypeArray:
         """Evaluate the model on input `x`.
 
         Parameters
@@ -182,18 +202,18 @@ def fit_model(
     Parameters
     ----------
     x : np.ndarray
-        Input data (independent variable).
+        Input data (independent variable)
     y : np.ndarray
-        Output data (dependent variable).
+        Output data (dependent variable)
     model : Model
-        Model including function and parameters.
+        Model including function and parameters
     max_iterations : int, optional
-        Maximum number of optimization iterations, by default 20000.
+        Maximum number of optimization iterations, by default 20000
 
     Returns
     -------
-    tuple[FittedModel, np.ndarray] | None
-        tuple with Fitted model and predictions on training data, or None if fitting failed.
+    tuple[FittedModel, np.ndarray]
+        tuple with Fitted model and predictions on training data
 
     Raises
     ------

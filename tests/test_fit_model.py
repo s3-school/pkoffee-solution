@@ -6,10 +6,12 @@ import pytest
 from pkoffee.data import AnyShapeDataDtypeArray, neg_inf, pos_inf
 from pkoffee.data import data_dtype as dt
 from pkoffee.fit_model import (
+    FunctionIdNotFoundInMappingError,
+    FunctionNotFoundInMappingError,
     Model,
+    ModelParsingError,
     fit_model,
 )
-from pkoffee.fit_model_io import FunctionIdNotFoundInMappingError, FunctionNotFoundInMappingError, ModelParsingError
 from pkoffee.parametric_function import ParametersBounds
 
 
@@ -77,7 +79,7 @@ def test_model_result_predict() -> None:
         r_squared=dt(0.95),
     )
 
-    x_new = np.array([0.0, 1.0, 2.0])
+    x_new = np.array([0.0, 1.0, 2.0], dtype=dt)
     predictions = model_result.predict(x_new)
 
     expected = np.array([1.0, 3.0, 5.0])

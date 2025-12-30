@@ -10,6 +10,9 @@ from pkoffee.data import data_dtype as dt
 from pkoffee.fit_model import Model
 from pkoffee.fit_model_io import (
     ModelFileFormat,
+    load_models,
+    load_models_json,
+    load_models_toml,
     pkoffee_function_id_mapping,
     save_models,
     save_models_json,
@@ -54,7 +57,7 @@ def assert_model_equal(lhs: Model, rhs: Model) -> None:
         assert lhs_field == rhs_field
 
 
-def test_save_models_json(tmp_path: Path) -> None:
+def test_save_load_models_json(tmp_path: Path) -> None:
     """Test model saving to json."""
     ref_model = Model(
         name="TestModel",
@@ -66,9 +69,7 @@ def test_save_models_json(tmp_path: Path) -> None:
     model_json_file = tmp_path / "test_save_models_json.json"
     fct_id_to_fct = pkoffee_function_id_mapping()
     save_models_json([ref_model.to_dict(fct_id_to_fct.inv)], model_json_file)
-    with model_json_file.open("r") as mdlf:
-        read_model = Model.from_dict(json.loads(mdlf.read())["Models"][0], fct_id_to_fct)
-
+    read_model = load_models_json(model_json_file, fct_id_to_fct)[0]
     assert_model_equal(ref_model, read_model)
 
 
@@ -84,9 +85,7 @@ def test_save_models_toml(tmp_path: Path) -> None:
     model_toml_file = tmp_path / "test_save_models_toml.toml"
     fct_id_to_fct = pkoffee_function_id_mapping()
     save_models_toml([ref_model.to_dict(fct_id_to_fct.inv)], model_toml_file)
-    with model_toml_file.open("r") as mdlf:
-        read_model = Model.from_dict(tomlkit.parse(mdlf.read())["Models"][0], fct_id_to_fct)  # pyright: ignore[reportArgumentType, reportIndexIssue]
-
+    read_model = load_models_toml(model_toml_file, fct_id_to_fct)[0]
     assert_model_equal(ref_model, read_model)
 
 
@@ -117,8 +116,7 @@ def test_save_models(tmp_path: Path) -> None:
     ]
     model_toml_file = tmp_path / "test_save_models_toml.toml"
     fct_id_to_fct = pkoffee_function_id_mapping()
-    save_models(models, fct_id_to_fct.inv, model_toml_file, ModelFileFormat.TOML)
-    with model_toml_file.open("r") as mdlf:
-        model_dicts = tomlkit.parse(mdlf.read())["Models"]
-        for ref_md, read_md in zip(models, model_dicts, strict=True):  # pyright: ignore[reportArgumentType] model_dicts is iterable alright
-            assert_model_equal(ref_md, Model.from_dict(read_md, fct_id_to_fct))
+    save_models(models, fct_id_to_fct.inv, model_toml_file)
+    read_models = load_models(model_toml_file, fct_id_to_fct)
+    for ref_md, read_md in zip(models, read_models, strict=True):  # pyright: ignore[reportArgumentType] model_dicts is iterable alright
+        assert_model_equal(ref_md, read_md)

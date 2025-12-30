@@ -1,7 +1,9 @@
 # Pixi
 .pixi/
+!.pixi/config.toml
 build/
 *.conda
+output/
 linux-64/
 noarch/
 osx-amd64/
@@ -147,6 +149,3 @@ dmypy.json
 marimo/_static/
 marimo/_lsp/
 __marimo__/
-
-#Ignore vscode AI rules
-.github/instructions/codacy.instructions.md
