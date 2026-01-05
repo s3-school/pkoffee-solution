@@ -1,5 +1,5 @@
-site_name: s3draft
-site_url: https://github.com/s3-school/draft-project/pages.html
+site_name: pkoffee
+site_url: https://github.com/s3-school/pkoffee-solution/pages.html
 site_dir: 'public/'
 
 docs_dir: "doc_src"
@@ -29,7 +29,7 @@ theme:
     - navigation.indexes # https://github.com/tlambert03/mkdocs-api-autonav?tab=readme-ov-file#mkdocs-material-suggestions
 
 # material display information about repository
-repo_url: https://github.com/s3-school/draft-project
+repo_url: https://github.com/s3-school/pkoffee-solution
 
 plugins:
 - search

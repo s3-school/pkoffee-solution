@@ -8,10 +8,21 @@ from pkoffee.log import LogLevel, init_logging
 from pkoffee.productivity_analysis import analyze
 
 
+class MissingVisualizationDependenciesError(ImportError):
+    """Error when visualization dependencies are missing."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            "pkoffee.visualization graphic dependencies missing! "
+            "To produce model visualization, install the pkoffee package with its dependencies, not pkoffee-base!"
+        )
+
+
 class PKoffeCommands(StrEnum):
-    """Commands of the pkoffe CLI."""
+    """Commands of the pkoffee CLI."""
 
     ANALYZE = "analyze"
+    PLOT = "plot"
 
 
 class UnsupportedCommandError(NotImplementedError):
@@ -67,23 +78,28 @@ Examples:
         formatter_class=PKoffeArgParseFormatter,
     )
     analyze_parser.add_argument(
+        "-d",
         "--data-file",
         type=Path,
+        required=True,
         dest="data_file",
         help="Path to CSV file with 'cups' and 'productivity' columns",
+    )
+    analyze_parser.add_argument(
+        "-m",
+        "--models",
+        type=Path,
+        dest="model_file",
+        default=None,
+        help="Model file to use as starting point for the fit (same structure as fitted model file)."
+        " If not supplied, the default models and parameter guesses will be used.",
     )
     analyze_parser.add_argument(
         "-o",
         "--output",
         type=Path,
-        default="analysis.png",
-        help="Output path for the analysis plot (default: analysis.png)",
-    )
-    analyze_parser.add_argument(
-        "--comparison",
-        type=Path,
-        default=None,
-        help="If supplied, also create a comparison plot with individual model panels at this path",
+        default="fitted_models.toml",
+        help="Output path for the fitted models (default: models.toml)",
     )
     analyze_parser.add_argument(
         "--show-rankings",
@@ -91,31 +107,61 @@ Examples:
         dest="show_rankings",
         help="Print model rankings to console",
     )
-    analyze_parser.add_argument(
-        "--no-plot",
-        action="store_true",
-        dest="no_plot",
-        help="Skip creating the main analysis plot",
+
+    # Plot command
+    plot_parser = subparsers.add_parser(
+        PKoffeCommands.PLOT.value,
+        help="Plot coffee productivity models over data",
+        formatter_class=PKoffeArgParseFormatter,
     )
-    analyze_parser.add_argument(
+    plot_parser.add_argument(
+        "-d",
+        "--data-file",
+        type=Path,
+        required=True,
+        dest="data_file",
+        help="Path to CSV file with 'cups' and 'productivity' columns",
+    )
+    plot_parser.add_argument(
+        "-m",
+        "--models",
+        type=Path,
+        required=True,
+        dest="model_file",
+        help="Fitted models which predictions will be plotted.",
+    )
+    plot_parser.add_argument(
+        "-o",
+        "--output",
+        type=Path,
+        default="analysis.png",
+        help="Output path for the analysis plot (default: analysis.png)",
+    )
+    plot_parser.add_argument(
+        "--comparison",
+        type=Path,
+        default=None,
+        help="If supplied, also create a comparison plot with individual model panels at this path",
+    )
+    plot_parser.add_argument(
         "--no-show",
         action="store_true",
         dest="no_show",
         help="Don't display plots (only save to files)",
     )
-    analyze_parser.add_argument(
+    plot_parser.add_argument(
         "--dpi",
         type=int,
         default=150,
         help="Resolution for saved figures (default: 150)",
     )
-    analyze_parser.add_argument(
+    plot_parser.add_argument(
         "--y-min",
         type=float,
         dest="y_min",
         help="Minimum y-axis value",
     )
-    analyze_parser.add_argument(
+    plot_parser.add_argument(
         "--y-max",
         type=float,
         dest="y_max",
@@ -134,6 +180,13 @@ def main() -> None:
     match args.command:
         case PKoffeCommands.ANALYZE:
             analyze(args)
+        case PKoffeCommands.PLOT:
+            try:
+                import pkoffee.visualization  # noqa: PLC0415 import at run-time to allow users to not install those dependencies
+            except ImportError as e:
+                raise MissingVisualizationDependenciesError from e
+
+            pkoffee.visualization.visualize(args)
         case _:
             raise UnsupportedCommandError(args.command)
 

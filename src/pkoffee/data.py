@@ -5,12 +5,17 @@ import logging
 import os
 from enum import StrEnum
 from pathlib import Path
+from typing import TypeVar
 
 import numpy as np
 import pandas as pd
 
 data_dtype = np.float32
+neg_inf = -data_dtype(np.inf)
+pos_inf = data_dtype(np.inf)
 accumulator_dtype = np.float64
+
+AnyShapeDataDtypeArray = TypeVar("AnyShapeDataDtypeArray", bound=np.ndarray[tuple[int, ...], np.dtype[data_dtype]])
 
 
 class RequiredColumn(StrEnum):
@@ -133,7 +138,9 @@ def load_csv(filepath: Path) -> pd.DataFrame:
     return curate(data)
 
 
-def extract_arrays(data: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
+def extract_arrays(
+    data: pd.DataFrame,
+) -> tuple[np.ndarray[tuple[int], np.dtype[data_dtype]], np.ndarray[tuple[int], np.dtype[data_dtype]]]:
     """Extract cups and productivity as numpy arrays from a DataFrame.
 
     Parameters

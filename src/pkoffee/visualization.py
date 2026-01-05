@@ -1,5 +1,6 @@
 """Visualization utilities for coffee productivity analysis."""
 
+import argparse
 import logging
 from enum import Enum, auto
 from pathlib import Path
@@ -13,8 +14,9 @@ from matplotlib import colormaps
 from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
 
-from pkoffee.data import RequiredColumn, data_dtype
-from pkoffee.fit_models import Model
+from pkoffee.data import RequiredColumn, data_dtype, load_csv
+from pkoffee.fit_model import Model
+from pkoffee.fit_model_io import load_models, pkoffee_function_id_mapping
 
 
 class Show(Enum):
@@ -289,48 +291,47 @@ def create_comparison_plot(
         plt.show()
 
 
-def format_model_rankings(fitted_models: list[Model]) -> str:
-    r"""Print a formatted table of model rankings.
+def visualize(args: argparse.Namespace) -> None:
+    """Plot model predictions and data.
 
     Parameters
     ----------
-    fitted_models : list[ModelResult]
-        List of fitted models, should be sorted by R².
-
-    Examples
-    --------
-    >>> from pkoffee.data import load_csv
-    >>> from pkoffee.productivity_analysis import fit_all_models
-    >>> data = load_csv(Path("coffee_productivity.csv")  # doctest: +SKIP
-    >>> models = fit_all_models(data)  # doctest: +SKIP
-    >>> print(format_model_rankings(models))  # doctest: +SKIP
-    Model Rankings:
-    ══════════════════════════════════════════════════
-    Rank   Model                R² Score
-    ══════════════════════════════════════════════════
-    1      Quadratic            0.9978
-    2      Peak²                0.9115
-    3      Logistic             0.7525
-    4      Peak                 0.6699
-    5      Michaelis-Menten     0.2347
-    ══════════════════════════════════════════════════
+    args : argparse.Namespace
+        Parsed command-line arguments.
     """
-    if not fitted_models:
-        return ""
+    # Load data
+    logger = logging.getLogger(__name__)
+    logger.info("Loading data from: %s", args.data_file)
+    data = load_csv(args.data_file)
+    logger.info("Loaded %s data points", len(data))
 
-    Model.sort(fitted_models)
+    # Load models
+    logger.info("Loading models from: %s", args.model_file)
+    models = load_models(args.model_file, pkoffee_function_id_mapping())
+    logger.info("Loaded %s models", len(models))
 
-    rank_nb_char = 6
-    model_nb_char = 20
-    line_nb_char = 50
+    # Determine y-axis limits
+    y_min = args.y_min if args.y_min is not None else data[RequiredColumn.PRODUCTIVITY].min()
+    y_max = args.y_max if args.y_max is not None else data[RequiredColumn.PRODUCTIVITY].max()
+    y_limits = (y_min, y_max)
 
-    ranking_str = "Model Rankings:\n"
-    ranking_str += "═" * line_nb_char + "\n"
-    ranking_str += f"{'Rank':<{rank_nb_char}} {'Model':<{model_nb_char}} R² Score\n"
-    ranking_str += "═" * line_nb_char + "\n"
-    for rank, model in enumerate(fitted_models, start=1):
-        r2_str = f"{model.r_squared:.4f}" if np.isfinite(model.r_squared) else "N/A"
-        ranking_str += f"{rank:<{rank_nb_char}} {model.name:<{model_nb_char}} {r2_str}\n"
-    ranking_str += "═" * 50
+    # Create main analysis plot
+    logger.info("Creating analysis plot: %s", args.output)
+    plot_models(
+        data,
+        models,
+        output_path=args.output,
+        fig_params=FigureParameters(y_limits=y_limits, dpi=args.dpi),
+        show=Show.YES if args.no_show else Show.NO,
+    )
 
-    return ranking_str
+    # Create comparison plot if requested
+    if args.comparison is not None:
+        logger.info("Creating comparison plot: %s", args.comparison)
+        create_comparison_plot(
+            data,
+            models,
+            output_path=args.comparison,
+            fig_params=FigureParameters(dpi=args.dpi),
+            show=Show.YES if args.no_show else Show.NO,
+        )

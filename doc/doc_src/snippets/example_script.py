@@ -4,9 +4,9 @@ import logging
 from pathlib import Path
 
 from pkoffee.data import load_csv
-from pkoffee.fit_models import Model
-from pkoffee.productivity_analysis import fit_all_models
-from pkoffee.visualization import FigureParameters, Show, format_model_rankings, plot_models
+from pkoffee.fit_model import Model
+from pkoffee.productivity_analysis import fit_all_models, format_model_rankings
+from pkoffee.visualization import FigureParameters, Show, plot_models
 
 
 def main() -> None:

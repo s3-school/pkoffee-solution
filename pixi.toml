@@ -3,48 +3,53 @@ channels = [
     "https://prefix.dev/pixi-build-backends",
     "https://prefix.dev/conda-forge",
 ]
-platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+platforms = ["linux-64", "linux-aarch64", "osx-64", "osx-arm64", "win-64"]
 preview = ["pixi-build"]
 
 [workspace.build-variants]
 python = ["3.12.*", "3.13.*", "3.14.*"]
 
 [dependencies]
-pkoffe = { path = "." }
+pkoffee = { path = "./recipe" }
 
-[package]
-name = "pkoffe"
-version = "0.1.0"
-authors = [
-    "Thomas Vuillaume <thomas.vuillaume@lapp.in2p3.fr>",
-    "Vincent Pollet <vincent.pollet@lapp.in2p3.fr>",
-]
-description = "Example pixi project"
-license = "MIT"
-homepage = "https://github.com/s3-school/draft-project"
-repository = "https://github.com/s3-school/draft-project"
-documentation = "https://github.com/s3-school/draft-project/blob/main/README.md"
+# Do not define the package here, rather in ./recipe/pixi.toml and ./recipe/recipe.yml so we can create 2 packages:
+# one with analysis only dependencies, and one with analysis + plot dependencies. 
+# The following was the definition of a single package doing analysis and plots, using the python build-backend
+# [package]
+# name = "pkoffee"
+# version = "0.1.0"
+# authors = [
+#     "Thomas Vuillaume <thomas.vuillaume@lapp.in2p3.fr>",
+#     "Vincent Pollet <vincent.pollet@lapp.in2p3.fr>",
+# ]
+# description = "S3School Pkoffe example package"
+# license = "MIT"
+# homepage = "https://github.com/s3-school/pkoffee-solution"
+# repository = "https://github.com/s3-school/pkoffee-solution"
+# documentation = "https://github.com/s3-school/pkoffee-solution/blob/main/README.md"
 
-[package.build]
-backend = { name = "pixi-build-python", version = ">=0.4.1,<5.0.0" }
+# [package.build]
+# backend = { name = "pixi-build-python", version = ">=0.4.1,<5.0.0" }
 
-[package.build.config]
+# [package.build.config]
 
-[package.build-dependencies]
+# [package.build-dependencies]
 
-[package.host-dependencies]
-# pixi build back-end calls uv or pip with "no-build-isolation" so build tools need to be available
-# setuptools and other build tools should be host dependencies for now, see https://pixi.sh/latest/build/dependency_types/#python-code
-uv = ">=0.9.9,<0.10.0"
-uv-build = ">=0.9.9,<0.10.0"
+# [package.host-dependencies]
+# # pixi build back-end calls uv or pip with "no-build-isolation" so build tools need to be available
+# # setuptools and other build tools should be host dependencies for now, see https://pixi.sh/latest/build/dependency_types/#python-code
+# uv = ">=0.9.9,<0.10.0"
+# uv-build = ">=0.9.9,<0.10.0"
 
-[package.run-dependencies]
-python = "*"
-numpy = ">=2.3.5,<3"
-pandas = ">=2.3.3,<3"
-scipy = ">=1.16.3,<2"
-matplotlib-base = ">=3.10.8,<4"
-seaborn = ">=0.13.2,<0.14"
+# [package.run-dependencies]
+# bidict = ">=0.23.1,<1"
+# python = "*"
+# numpy = ">=2.3.5,<3"
+# matplotlib-base = ">=3.10.8,<4"
+# pandas = ">=2.3.3,<3"
+# scipy = ">=1.16.3,<2"
+# seaborn = ">=0.13.2,<0.14"
+# tomlkit = ">=0.13.3,<1"
 
 # A feature per-python version to test the build-variants
 [feature.py312.dependencies]
@@ -104,7 +109,11 @@ cmd = [
     "mkdocs", "build", "--strict", "--clean", "-f", "doc/mkdocs.yml", "-d", "../{{ docDir }}"
 ]
 
+[feature.analysisonly.dependencies]
+pkoffee-base = { path = "./recipe" }
+
 [environments]
+prodanalysisonly = { features = ["py313", "analysisonly"], no-default-feature = true } # for now must not mix with environemnt using pkoffee package
 prod = { features = ["py313"], solve-group = "prod" }
 test = { features = ["test", "py313"], solve-group = "prod" }
 # use default for the dev environment so tasks are resolved in this environment (avoids having to specify env)

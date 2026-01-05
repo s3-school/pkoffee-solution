@@ -1,6 +1,6 @@
 # Configuration Example
 
-s3draft has no configuration files, but if it had one it could be included as examples like so:
+pkoffee has no configuration files, but if it had one it could be included as examples like so:
 
 !!! note
 
