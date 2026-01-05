@@ -2,7 +2,7 @@
 # More examples at https://github.com/pavelzw/pixi-docker-example
 
 # To build the image locally, from the pkoffee-solution directory:
-# docker build -f docker/pkoffee-base/Dockerfile -t pkoffee:local --build-arg INSTALL_ENV=prod .
+# docker build -f docker/Dockerfile -t pkoffee:local --build-arg INSTALL_ENV=prod .
 # Can also use docker build options --no-cache --progress=plain for easier debugging
 
 ARG INSTALL_ENV=prod
@@ -34,4 +34,5 @@ ENV CONDA_PREFIX=/app/.pixi/envs/"$INSTALL_ENV"
 CMD [ "pkoffee" ]
 
 # Example of using the local image
-# docker run --mount type=bind,src=$(pwd)/doc/doc_src/example_data,dst=/example_data --mount type=bind,src=$(pwd)/results,destination=/analysis_results pkoffee:local pkoffee analyze --data-file /example_data/coffee_productivity.csv --output /analysis_results/analysis.png
+# docker run --mount type=bind,src=$(pwd)/doc/doc_src/example_data,dst=/example_data --mount type=bind,src=$(pwd)/results,destination=/analysis_results pkoffee:local pkoffee analyze --data-file /example_data/coffee_productivity.csv --output /analysis_results/fitted_models.toml
+# docker run --mount type=bind,src=$(pwd)/doc/doc_src/example_data,dst=/example_data --mount type=bind,src=$(pwd)/results,destination=/analysis_results pkoffee:local pkoffee plot --data-file /example_data/coffee_productivity.csv --models /analysis_results/fitted_models.toml --output /analysis_results/analysis.png

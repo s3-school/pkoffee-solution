@@ -81,7 +81,7 @@ def save_models_json(model_dicts: Iterable[dict], output_path: Path) -> None:
 
     Parameters
     ----------
-    models : Iterable[dict]
+    model_dicts : Iterable[dict]
         Models dictionary representation
     output_path : Path
         Path to save the models

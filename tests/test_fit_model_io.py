@@ -1,15 +1,11 @@
 """Test suite of `pkoffee.fit_model_io`."""
 
-import json
 from dataclasses import astuple
 from pathlib import Path
-
-import tomlkit
 
 from pkoffee.data import data_dtype as dt
 from pkoffee.fit_model import Model
 from pkoffee.fit_model_io import (
-    ModelFileFormat,
     load_models,
     load_models_json,
     load_models_toml,
