@@ -48,13 +48,14 @@ def pkoffe_argparser() -> argparse.ArgumentParser:
         epilog="""
 Examples:
   # Analyze data and create visualization
-  pkoffee analyze data.csv --output results.png
+  pkoffee analyze --data-file data.csv --output model_fit.toml
+  pkoffee plot --data-file data.csv --models model_fit.toml --output analysis.png
 
   # Show model rankings without plot
-  pkoffee analyze data.csv --show-rankings --no-plot
+  pkoffee analyze --data-file data.csv --show-rankings
 
   # Create comparison plot
-  pkoffee analyze data.csv --comparison comparison.png
+  pkoffee plot --data-file data.csv --models model_fit.toml --output analysis.png --comparison comparison.png
         """,
     )
 
@@ -134,13 +135,15 @@ Examples:
         "-o",
         "--output",
         type=Path,
+        metavar="IMAGE_FILENAME",
         default="analysis.png",
         help="Output path for the analysis plot (default: analysis.png)",
     )
     plot_parser.add_argument(
         "--comparison",
         type=Path,
-        default=None,
+        default="comparison.png",
+        metavar="IMAGE_FILENAME",
         help="If supplied, also create a comparison plot with individual model panels at this path",
     )
     plot_parser.add_argument(
