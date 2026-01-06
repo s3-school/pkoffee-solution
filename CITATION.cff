@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "PKoffee: Coffee Productivity Analysis"
+version: 0.1.0
+date-released: 2026-01-01
+abstract: "Coffee productivity analysis with statistical modeling"
+authors:
+  - family-names: Vuillaume
+    given-names: Thomas
+    email: thomas.vuillaume@lapp.in2p3.fr
+    orcid: https://orcid.org/0000-0002-5686-2078
+  - family-names: Pollet
+    given-names: Vincent
+    email: vincent.pollet@lapp.in2p3.fr
+license: MIT
+repository-code: "https://github.com/s3-school/pkoffee-solution"
+keywords:
+  - coffee
+  - statistical-modeling
+  - python
