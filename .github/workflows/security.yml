@@ -1,0 +1,39 @@
+name: Security Scans
+
+on:
+  push:
+    branches: [ main, security ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  bandit:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Bandit security scan
+      uses: PyCQA/bandit-action@v1
+      with:
+        configfile: pyproject.toml
+
+  gitleaks:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Gitleaks secret scan
+      uses: gitleaks/gitleaks-action@v2
+      with:
+        args: detect --source . --no-git --redact
