@@ -32,9 +32,14 @@ jobs:
       contents: read
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
 
     - name: Gitleaks secret scan
       uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }} 
       with:
         args: detect --source . --no-git --redact
