@@ -16,11 +16,12 @@ jobs:
       contents: read
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Bandit security scan
       uses: PyCQA/bandit-action@v1
       with:
+        python-version: '3.13'
         configfile: pyproject.toml
 
   gitleaks:
