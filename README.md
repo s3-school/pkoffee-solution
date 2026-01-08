@@ -36,22 +36,18 @@ data = load_csv(Path("coffee_productivity.csv"))
 fitted_models = fit_all_models(data)
 
 # Create visualization
-plot_models(data, fitted_models, output_path="results.png")
+plot_models(data, fitted_models, output_path=Path("results.png"))
 ```
 
 ## Command Line Interface
 
 ```bash
 # Analyze
-cd analysis
-pkoffee analyze --data-file coffee_productivity.csv --output analysis.png
-```
-
-# View model rankings
-
-```bash
-cd analysis
-pkoffee-sol analyze --data-file coffee_productivity.csv --show-rankings
+cd analysis && pixi shell
+# fit models and save to toml
+pkoffee analyze --data-file coffee_productivity.csv --output fitted_models.toml --show-rankings
+# plot models predictions
+pkoffee plot --data-file coffee_productivity.csv --models fitted_models.toml --output analysis.png --y-max 7
 ```
 
 ## Project Structure
@@ -78,8 +74,7 @@ pkoffee-sol/
 ├── README.md
 ├── pixi.toml
 ├── pixi.lock
-├── pyproject.toml
-└── setup.py
+└── pyproject.toml
 ```
 
 ## Models Implemented
@@ -93,9 +88,19 @@ pkoffee-sol/
 ## Development
 
 ```bash
+# Activate the environment
+pixi shell
+# use development dependencies like jupyter notebooks/ipython
+jupyterlab
+```
+#### Tests
+```bash
 # Run tests
 pixi run test
+```
 
+#### Linting
+```bash
 # Linting
 pixi run lint
 pixi run format
