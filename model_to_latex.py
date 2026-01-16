@@ -12,20 +12,25 @@ def write_line(f, s="", indent=0):
 
 
 def write_model(f, model):
-    colspec = "{" + " ".join(["l"] + ["r"] * len(model["params"])) + "}"
+    write_line(f, r"\begin{table}")
+    caption = f"Best-fit parameters of the {model['name']} model."
+    write_line(f, r"\centering")
+    write_line(f, rf"\caption{{{caption}}}")
+    write_line(f, r"\vspace{0.5\baselineskip}")
     write_line(f, r"\begin{tblr}{")
-    write_line(f, f"colspec = {colspec},", indent=2)
+    write_line(f, "colspec = {l r},", indent=2)
     write_line(f, "}")
+    write_line(f, r"\toprule", indent=2)
+    write_line(f, r"Name & Value \\", indent=2)
+    write_line(f, r"\midrule", indent=2)
 
-    param_names = [escape_latex(p) for p in model["params"]]
-    write_line(f, " & ".join(["  Model", *param_names]) + r" \\")
-    f.write("  " + model["name"])
-    for param in model["params"].values():
-        f.write(" & ")
-        f.write(f"{param:.4g}")
+    for name, value in model["params"].items():
+        name = escape_latex(name)
+        write_line(f, rf"{name} & {value:.4g} \\", indent=2)
 
-    write_line(f, r"\\")
+    write_line(f, r"\bottomrule", indent=2)
     write_line(f, r"\end{tblr}")
+    write_line(f, r"\end{table}")
     write_line(f)
 
 

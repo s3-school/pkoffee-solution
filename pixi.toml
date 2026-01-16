@@ -108,7 +108,7 @@ cmd = [
 
 [feature.paper.tasks]
 outdir = { cmd = ["mkdir", "-p", "build"], outputs = ["build"] }
-model-tex = { cmd = ["python", "model_to_latex.py"], inputs = ["build/model.json"], depends-on = ["analyze"], outputs = ["build/model.tex"]}
+model-tex = { cmd = ["python", "model_to_latex.py"], inputs = ["build/model.json", "model_to_latex.py"], depends-on = ["analyze"], outputs = ["build/model.tex"]}
 
 [feature.paper.tasks.analyze]
 cmd = ["pkoffee", "analyze", "-d", "analysis/coffee_productivity.csv", "-o", "build/model.json"]

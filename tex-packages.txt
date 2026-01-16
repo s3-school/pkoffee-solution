@@ -1,5 +1,7 @@
 babel
 babel-english
+booktabs
+epstopdf-pkg
 fontspec
 geometry
 graphics
@@ -10,4 +12,3 @@ luatex
 luatexbase
 tabularray
 tools
-epstopdf-pkg
