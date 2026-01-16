@@ -4,7 +4,8 @@ This module provides functions with signature f(x, *args, **kwargs), where `x` i
 arguments are the function parameters. Functions also provide guesses and boundaries for parameter values.
 """
 
-from typing import NamedTuple, ParamSpec, Protocol, runtime_checkable
+from abc import abstractmethod
+from typing import Any, NamedTuple, Protocol, runtime_checkable
 
 import numpy as np
 
@@ -26,33 +27,15 @@ class ParametersBounds(NamedTuple):
     max: dict[str, data_dtype]
 
 
-AnyDataDtypeArgsKwargs = ParamSpec("AnyDataDtypeArgsKwargs", bound=data_dtype)  # pyright: ignore[reportGeneralTypeIssues] bound parameter exists.
-AnyArgsKwargs = ParamSpec("AnyArgsKwargs")
-
-
 @runtime_checkable
-class ParametricFunction(Protocol[AnyShapeDataDtypeArray, AnyDataDtypeArgsKwargs, AnyArgsKwargs]):
+class ParametricFunction(Protocol):
     """Parametric function API."""
 
-    def __call__(
-        self, x: AnyShapeDataDtypeArray, *args: AnyDataDtypeArgsKwargs.args, **kwargs: AnyDataDtypeArgsKwargs.kwargs
-    ) -> AnyShapeDataDtypeArray:
-        """Evaluate the parametric function on input `x` with parameters values passed with `*args` and `**kwargs`.
-
-        Parameters
-        ----------
-        x : AnyShapeDataDtypeArray
-            The input to the function, an array of any shape, of dtype `data_dtype`.
-
-        Returns
-        -------
-        AnyShapeDataDtypeArray
-            Output of the function at `x`.
-        """
-        ...
+    __call__: Any
 
     @classmethod
-    def param_guess(cls, *args: AnyArgsKwargs.args, **kwargs: AnyArgsKwargs.kwargs) -> dict[str, data_dtype]:
+    @abstractmethod
+    def param_guess(cls, *args, **kwargs) -> dict[str, data_dtype]:
         """Guess values of the `ParametricFunction` parameters.
 
         The guess values can typically be used as starting values for a fit of the parameters.
@@ -68,6 +51,7 @@ class ParametricFunction(Protocol[AnyShapeDataDtypeArray, AnyDataDtypeArgsKwargs
         ...
 
     @classmethod
+    @abstractmethod
     def param_bounds(cls) -> ParametersBounds:
         """Min/max values of the `ParametricFunction` parameters.
 
@@ -91,9 +75,7 @@ class Quadratic:
     from https://en.wikipedia.org/w/index.php?title=Quadratic_function&oldid=1311755644
     """
 
-    def __call__(
-        self, x: AnyShapeDataDtypeArray, a0: data_dtype, a1: data_dtype, a2: data_dtype
-    ) -> AnyShapeDataDtypeArray:
+    def __call__(self, x: AnyShapeDataDtypeArray, a0: data_dtype, a1: data_dtype, a2: data_dtype) -> AnyShapeDataDtypeArray:
         """Evaluate the quadratic function at each point in `x`.
 
         Parameters
@@ -112,7 +94,7 @@ class Quadratic:
         AnyShapeDataDtypeArray
             QuadraticFunction value at each point in `x`.
         """
-        return a0 + a1 * x + a2 * x**2  # type: ignore[reportReturnType] return type is data_dtype alright
+        return a0 + a1 * x + a2 * x**2
 
     @classmethod
     def param_guess(cls, y_min: data_dtype) -> dict[str, data_dtype]:
@@ -153,9 +135,7 @@ class MichaelisMentenSaturation:
        from https://en.wikipedia.org/w/index.php?title=Michaelis%E2%80%93Menten_kinetics&oldid=1325118298
     """
 
-    def __call__(
-        self, x: AnyShapeDataDtypeArray, v_max: data_dtype, k: data_dtype, y0: data_dtype
-    ) -> AnyShapeDataDtypeArray:
+    def __call__(self, x: AnyShapeDataDtypeArray, v_max: data_dtype, k: data_dtype, y0: data_dtype) -> AnyShapeDataDtypeArray:
         """Evaluate the MichaelisMenten Function in each point in `x`.
 
         Parameters
@@ -174,12 +154,10 @@ class MichaelisMentenSaturation:
         AnyShapeDataDtypeArray
             MichaelisMenten function value at each point in `x`.
         """
-        return y0 + v_max * (x / np.maximum(k + x, 1e-9))  # type: ignore[reportReturnType] return type is data_dtype alright
+        return y0 + v_max * (x / np.maximum(k + x, 1e-9))
 
     @classmethod
-    def param_guess(
-        cls, x_min: data_dtype, x_max: data_dtype, y_min: data_dtype, y_max: data_dtype
-    ) -> dict[str, data_dtype]:
+    def param_guess(cls, x_min: data_dtype, x_max: data_dtype, y_min: data_dtype, y_max: data_dtype) -> dict[str, data_dtype]:
         """Parameter guesses for a fit initial values.
 
         x are the function input values, y the predictions in the data points. `v_max` guess is the prediction range,
@@ -257,12 +235,10 @@ class Logistic:
         AnyShapeDataDtypeArray
             Logistic function value at each point in `x`.
         """
-        return y0 + L / (1.0 + np.exp(-k * (x - x0)))  # type: ignore[reportReturnType] return type is data_dtype alright
+        return y0 + L / (1.0 + np.exp(-k * (x - x0)))
 
     @classmethod
-    def param_guess(
-        cls, x_min: data_dtype, x_max: data_dtype, y_min: data_dtype, y_max: data_dtype
-    ) -> dict[str, data_dtype]:
+    def param_guess(cls, x_min: data_dtype, x_max: data_dtype, y_min: data_dtype, y_max: data_dtype) -> dict[str, data_dtype]:
         """Parameter guesses for a fit initial values.
 
         x are the function input values, y the predictions in the data points. `L` is typically close to the

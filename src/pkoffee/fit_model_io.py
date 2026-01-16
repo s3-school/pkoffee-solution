@@ -174,7 +174,7 @@ def load_models_toml(model_file: Path, str_to_function: Mapping) -> list[Model]:
     """
     with model_file.open("r") as mdlf:
         models_dict = tomlkit.parse(mdlf.read())["Models"]
-    return [Model.from_dict(m_d, str_to_function) for m_d in models_dict]  # pyright: ignore[reportGeneralTypeIssues] models_dict is iterable alright
+    return [Model.from_dict(m_d, str_to_function) for m_d in models_dict]  # type: ignore[misc]
 
 
 def load_models(
