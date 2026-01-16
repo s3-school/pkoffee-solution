@@ -132,7 +132,6 @@ depends-on = ["analyze"]
 cmd = ["latexmk", "-norc", "-r", "latexmkrc", "paper.tex", "--output-directory=build"]
 depends-on = ["plots", "model-tex"]
 
-
 [environments]
 prod = { features = ["py313", "paper"], solve-group = "prod" }
 test = { features = ["test", "py313"], solve-group = "prod" }
