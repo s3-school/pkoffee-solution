@@ -91,6 +91,7 @@ ruff = ">=0.14,<0.15"
 [feature.dev.tasks]
 format = "ruff format"
 lint = "ruff check"
+type-check = "ty check src"
 
 [feature.doc.dependencies]
 mkdocstrings-python = ">=2.0.0,<3"
