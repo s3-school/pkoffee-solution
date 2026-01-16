@@ -16,6 +16,9 @@ pydocstyle = { convention = "numpy" }
     # "PLR2004", # Magic value used in comparison in tests
     # "S311",    # Standard pseudo-random generators are not suitable for cryptographic purposes
 ]
+"example.py" = [
+    "T201"
+]
 
 [format]
 # This is currently disabled by default, but it is planned for this
