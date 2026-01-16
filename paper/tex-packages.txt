@@ -2,6 +2,7 @@ babel
 babel-english
 booktabs
 epstopdf-pkg
+etoolbox
 fontspec
 geometry
 graphics
