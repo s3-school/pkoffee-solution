@@ -106,8 +106,35 @@ cmd = [
     "mkdocs", "build", "--strict", "--clean", "-f", "doc/mkdocs.yml", "-d", "../{{ docDir }}"
 ]
 
+[feature.paper.tasks]
+outdir = { cmd = ["mkdir", "-p", "build"], outputs = ["build"] }
+model-tex = { cmd = ["python", "model_to_latex.py"], inputs = ["build/model.json"], depends-on = ["analyze"], outputs = ["build/model.tex"]}
+
+[feature.paper.tasks.analyze]
+cmd = ["pkoffee", "analyze", "-d", "analysis/coffee_productivity.csv", "-o", "build/model.json"]
+inputs = ["analysis/coffee_productivity.csv"]
+depends-on = ["outdir"]
+outputs = ["build/model.json"]
+
+[feature.paper.tasks.plots]
+cmd = [
+  "pkoffee", "plot",
+  "-d", "analysis/coffee_productivity.csv",
+  "-m", "build/model.json", 
+  "-o", "build/plot.pdf",
+  "--comparison", "build/comparison.pdf",
+]
+inputs = ["analysis/coffee_productivity.csv", "build/model.json"]
+outputs = ["build/plot.pdf", "build/comparison.pdf"]
+depends-on = ["analyze"]
+
+[feature.paper.tasks.paper]
+cmd = ["latexmk", "-norc", "-r", "latexmkrc", "paper.tex", "--output-directory=build"]
+depends-on = ["plots", "model-tex"]
+
+
 [environments]
-prod = { features = ["py313"], solve-group = "prod" }
+prod = { features = ["py313", "paper"], solve-group = "prod" }
 test = { features = ["test", "py313"], solve-group = "prod" }
 # use default for the dev environment so tasks are resolved in this environment (avoids having to specify env)
 # no need to include doc: pixi will figure the environment to use from the task if it is unique

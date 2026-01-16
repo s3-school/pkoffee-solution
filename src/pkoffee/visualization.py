@@ -255,7 +255,9 @@ def create_comparison_plot(
 
     for model, ax in zip(fitted_models, axes, strict=False):  # may be more axes than models
         # Scatter plot of data
-        ax.scatter(cups, productivity, alpha=0.3, s=10, color="gray", label="Data")
+        plot = ax.scatter(cups, productivity, alpha=0.3, s=10, color="gray", label="Data")
+        # pdf struggles with too many points as vector graphics, store as image
+        plot.set_rasterized(True)
 
         # Model fit
         y_smooth = model.predict(x_smooth)
