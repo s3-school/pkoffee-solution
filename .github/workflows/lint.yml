@@ -1,0 +1,29 @@
+name: Linting
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Setup Pixi
+      uses: prefix-dev/setup-pixi@v0.9.3
+      with:
+        pixi-version: v0.62.2
+        cache: true
+        environments: default
+
+    - name: Ruff check
+      run: pixi run lint
+
+    - name: Ruff format
+      run: pixi run format --check
+
+    - name: Ty type-check
+      run: pixi run type-check

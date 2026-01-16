@@ -29,20 +29,3 @@ jobs:
 
     - name: Run tests
       run: pixi run -e ${{ matrix.environment }} test
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Pixi
-      uses: prefix-dev/setup-pixi@v0.9.3
-      with:
-        pixi-version: v0.60.0
-        cache: true
-        cache-write: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
-
-    - name: Linting
-      run: pixi run lint
-      continue-on-error: true
