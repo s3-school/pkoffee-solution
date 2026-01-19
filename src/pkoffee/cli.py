@@ -185,7 +185,7 @@ def main() -> None:
             analyze(args)
         case PKoffeCommands.PLOT:
             try:
-                import pkoffee.visualization  # noqa: PLC0415 import at run-time to allow users to not install those dependencies
+                import pkoffee.visualization  # noqa: PLC0415
             except ImportError as e:
                 raise MissingVisualizationDependenciesError from e
 
