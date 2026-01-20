@@ -13,6 +13,8 @@ python = ["3.12.*", "3.13.*", "3.14.*"]
 pkoffee = { path = "." }
 ty = ">=0.0.12,<0.0.13"
 ruff = ">=0.14.12,<0.15"
+sphinx = ">=9.1.0,<10"
+nbsphinx = ">=0.9.8,<0.10"
 
 [package]
 name = "pkoffee"
@@ -126,3 +128,6 @@ testpy312 = {features = ["test", "py312"] }
 
 # Doc environment only contains documentation tools, not the package dependencies
 doc = { features = ["doc"], no-default-feature = true }
+
+[pypi-dependencies]
+sphinx-rtd-theme = ">=3.1.0, <4"
