@@ -101,7 +101,8 @@ myst-parser = ">=5.0.0"
 sphinx-rtd-theme = ">=3.1.0, <4"
 
 [feature.sphinx-doc.tasks]
-sphinx-html = "make html"
+sphinx-html = "sphinx-build -b html docs build_docs"
+sphinx-clean = "rm -rf build_docs"
 
 [tasks]
 build-package = "python -m build"
