@@ -1,24 +1,228 @@
-\documentclass{article}
+\documentclass[numbers,webpdf]{ima-authoring-template}
 
-\usepackage[american]{babel}
-\usepackage{graphicx}
-
+\usepackage{booktabs}
 \usepackage{tabularray}
-\UseTblrLibrary{booktabs}
-
-\title{Does Coffee enhance Productivity?}
+\graphicspath{{Fig/}{../build/}}
+\numberwithin{equation}{section}
 
 \begin{document}
 
+\DOI{10.6084/m9.figshare.31049104}
+\copyrightyear{2025}
+\vol{00}
+\pubyear{2025}
+\access{Advance Access Publication Date: 15 October 2025}
+\appnotes{Paper}
+\firstpage{1}
+
+\title[Coffee and Developer Productivity]{Quantifying the Relationship Between Coffee Consumption and Developer Productivity: An Observational Study in a Software Engineering Laboratory}
+
+\author{Jean Dupont*
+\address{\orgdiv{Laboratory for Human-Centred Computing}, 
+\orgname{Université de Montclair}, 
+\orgaddress{\street{12 Rue des Sciences}, \postcode{75000}, \country{Fictionland}}}}
+\authormark{Dupont}
+
+\corresp[*]{Corresponding author: \href{mailto:jean.dupont@umontclair.edu}{jean.dupont@umontclair.edu}}
+
+\received{12}{06}{2025}
+\revised{03}{09}{2025}
+\accepted{21}{09}{2025}
+
+%------------------------------------------------
+
+\abstract{
+We report an observational study conducted in a university software engineering laboratory investigating the relationship between daily coffee consumption and developer productivity. Over a 12-week project-based course, we collected $N=200{,}000$ time-stamped records combining self-reported coffee intake with automatically extracted development activity (Git commits) and issue-tracker events. Productivity is operationalised as the ratio between commits and defect-related events. Five parametric models were fitted to the observed data, including quadratic, saturating, logistic, and peaked functional forms. Model comparison using the coefficient of determination ($R^{2}$) shows that a logistic model provides the best numerical fit ($R^{2}=0.305$), although all models explain less than 35\% of the variance. The results reveal a robust unimodal relationship with a maximum around 2--3 cups per session and a clear regime of performance degradation beyond six cups.
+}
+
+\keywords{coffee consumption; software productivity; observational study; nonlinear regression; empirical software engineering}
+
 \maketitle
+
+%------------------------------------------------
+
+\section{Introduction}
+
+Coffee is a ubiquitous stimulant in software engineering environments and is frequently associated—often anecdotally—with improved concentration and productivity. Despite its cultural prominence, the empirical relationship between caffeine intake and measurable development output remains poorly characterised, particularly in naturalistic academic settings.
+
+Measuring developer productivity is itself a longstanding challenge in empirical software engineering, as productivity is multi-dimensional and influenced by task complexity, collaboration, experience, circadian rhythms, and organisational context. Consequently, observational studies of behavioural factors such as caffeine intake must be interpreted with caution.
+
+This paper presents a large-scale observational analysis conducted in a project-based software engineering laboratory. Students self-reported their coffee consumption during development sessions, while their development activity and defect-related events were instrumented automatically. The study serves both as an empirical investigation and as a pedagogical case study illustrating data collection, preprocessing, model fitting, and the interpretation of noisy behavioural data.
+
+%------------------------------------------------
+
+\section{Data Collection and Preprocessing}
+
+\subsection{Laboratory Setting and Participants}
+
+The study was conducted during the Autumn software engineering project course at the Université de Montclair. The course involved 240 master's-level students working in teams on medium-scale software projects over a 12-week period.
+
+Students logged the number of cups of coffee consumed during each development session using a lightweight web form integrated into the course infrastructure. Each entry was time-stamped and associated with a pseudonymous identifier.
+
+\subsection{Automated Extraction of Development Events}
+
+Development activity was harvested automatically from institutional Git repositories and the associated issue-tracking system:
+
+\begin{itemize}
+\item \textbf{Commits ($C$)}: the number of Git commits attributed to a participant within a given logging interval.
+\item \textbf{Bugs ($B$)}: defect-related events extracted from issue labels and commit messages using a rule-based classifier. Labels such as \texttt{bug}, \texttt{fix}, and \texttt{hotfix} were aggregated. A random subset of 1,000 records was manually audited, yielding an estimated precision of 0.87.
+\end{itemize}
+
+\subsection{Outcome Measure: Productivity}
+
+We define a pragmatic productivity metric as
+\begin{equation}
+P = \frac{C}{1 + B},
+\end{equation}
+which trades off development activity against observed defect signals.
+
+The final dataset contains $N = 200{,}000$ matched records $(x, C, B)$, where $x$ is the integer number of cups of coffee reported for a given session, with $x \in [0,12]$.
+
+%------------------------------------------------
+
+\section{Candidate Models and Fitting Procedure}
+
+We fitted five parametric models commonly used to represent dose--response and saturation effects:
+
+\begin{enumerate}
+\item Quadratic:
+\[
+f(x) = a_0 + a_1 x + a_2 x^2
+\]
+
+\item Saturating (Michaelis--Menten):
+\[
+f(x) = y_0 + V_{\max}\frac{x}{K+x}
+\]
+
+\item Logistic:
+\[
+f(x) = y_0 + \frac{L}{1+\exp(-k(x-x_0))}
+\]
+
+\item Peak:
+\[
+f(x) = a x \exp(-x/b)
+\]
+
+\item Peak2:
+\[
+f(x) = a x^2 \exp(-x/b)
+\]
+\end{enumerate}
+
+Models were fitted using nonlinear least squares with bounded optimisation. Model performance was evaluated using the coefficient of determination
+
+\begin{equation}
+R^2 = 1 - \frac{\sum_i (P_i - \hat{P}_i)^2}{\sum_i (P_i - \bar{P})^2}.
+\end{equation}
+
+%------------------------------------------------
+
+\section{Visualisation}
+
+To visualise both distributional structure and model trends, we constructed grouped violin plots of productivity by integer coffee intake and overlaid fitted curves evaluated on a dense grid $x \in [0,12]$.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.95\linewidth]{build/plot.png}
+\caption{Observed productivity distributions per coffee-intake level with fitted model curves overlaid.}
+\label{fig:fit}
+\end{figure}
+
+%------------------------------------------------
 
 \section{Results}
 
-\includegraphics[width=\textwidth]{build/plot.pdf}
+Figure~\ref{fig:fit} reveals three distinct regimes.
 
-\includegraphics[width=\textwidth]{build/comparison.pdf}
+For low intake (0--1 cups), productivity exhibits a broad distribution with a low median and long upper tails. A second regime emerges between 2 and 4 cups, where productivity reaches its maximum with a median around $P \approx 2.2$ and reduced variance. Beyond 5 cups, productivity decreases monotonically and converges towards low values, with median productivity falling below $P=1$ for $x \geq 6$.
 
-\section{Appendix}
-\input{./build/model.tex}
+\begin{table}[!t]
+\caption{Model performance measured by $R^2$.}
+\label{tab:r2}
+\begin{tabular*}{\columnwidth}{@{\extracolsep\fill}lc@{\extracolsep\fill}}
+\toprule
+Model & $R^2$ \\
+\midrule
+Logistic & 0.305 \\
+Quadratic & 0.282 \\
+Saturating (Michaelis--Menten) & 0.278 \\
+Peak ($ax e^{-x/b}$) & 0.171 \\
+Peak2 ($ax^2 e^{-x/b}$) & 0.147 \\
+\botrule
+\end{tabular*}
+\end{table}
+
+Although the logistic model achieves the highest numerical fit, all models explain less than 35\% of the variance.
+
+\subsection{Best-fit parameters}
+
+The best-fit parameters for all five models are presented in the following tables:
+
+\input{build/model.tex}
+
+%------------------------------------------------
+
+\section{Discussion}
+
+\subsection{Unimodal structure and optimal intake}
+
+The empirical distributions and fitted curves consistently reveal a unimodal relationship between coffee consumption and developer productivity. Productivity increases from zero to moderate intake, reaches a maximum between 2 and 3 cups per session, and then decreases steadily for larger intakes.
+
+This behaviour is well approximated by peaked functional forms of the type
+\[
+P(x) \sim x^\alpha \exp(-x/b),
+\]
+which correspond to classical arousal--fatigue models in cognitive psychology.
+
+The observed optimum is stable across all fitted families:
+\[
+x^* \approx 2.5 \pm 0.5.
+\]
+
+\subsection{Model comparison}
+
+Although the logistic model achieves the highest numerical $R^2$, it is conceptually monotonic and does not explicitly encode a degradation regime. In contrast, peaked models directly capture both stimulation and fatigue effects, making them more consistent with the observed empirical structure.
+
+\subsection{Performance degradation}
+
+Beyond approximately six cups per session, productivity decreases monotonically and stabilises at a low level. The reduced variance observed in this regime suggests a saturation effect in which excessive caffeine intake systematically degrades performance across individuals.
+
+\subsection{Limitations}
+
+\begin{itemize}
+\item Coffee intake is self-reported and subject to rounding and recall bias.
+\item Defect detection relies on heuristic label extraction.
+\item Confounding variables (sleep, stress, workload) remain uncontrolled.
+\item Commit counts are a coarse proxy for semantic productivity.
+\end{itemize}
+
+%------------------------------------------------
+
+\section{Conclusion}
+
+Using a large-scale observational dataset collected in a software engineering laboratory, this study identifies a weak but robust unimodal relationship between coffee consumption and developer productivity. Productivity peaks at approximately 2--3 cups per session and decreases steadily for higher intake, with a clear regime of performance degradation beyond six cups.
+
+While logistic regression provides the best numerical fit, peaked models better capture the underlying physiological structure of the phenomenon. The primary contribution of this work is pedagogical, providing a realistic case study for empirical modelling and behavioural data analysis.
+
+%------------------------------------------------
+
+\section*{Funding}
+
+The OSCARS project has received funding from the European Commission’s Horizon Europe Research and Innovation programme under grant agreement No. 101129751. This project has received funding from the European Union’s Horizon Europe Programme under GA 101129744 — EVERSE — HORIZON-INFRA-2023-EOSC-01-02.
+
+\section*{Disclaimer}
+
+This article is a fictional work created for educational purposes.  
+The study, data, results, and conclusions presented in this paper are entirely synthetic.
+
+The manuscript was generated with the assistance of ChatGPT (OpenAI) as part of a pedagogical exercise for the S3 School and does not represent real research, real experiments, or real participants.
+
+This document is intended solely for training, illustration, and teaching purposes.
+
+More information about the S3 School can be found at:  
+\url{https://indico.in2p3.fr/event/36319/}
+
 
 \end{document}
