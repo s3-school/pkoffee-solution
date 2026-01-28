@@ -1,0 +1,15 @@
+babel
+babel-english
+booktabs
+epstopdf-pkg
+etoolbox
+fontspec
+geometry
+graphics
+hyperref
+latex-bin
+latexmk
+luatex
+luatexbase
+tabularray
+tools

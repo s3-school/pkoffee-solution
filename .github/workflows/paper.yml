@@ -1,0 +1,35 @@
+name: Build Paper
+
+on:
+  push:
+    branches: main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  paper:
+    runs-on: "ubuntu-latest"
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Pixi
+      uses: prefix-dev/setup-pixi@v0.9.3
+      with:
+        pixi-version: v0.63.0
+        cache: true
+        cache-write: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
+
+    - name: Install texlive
+      run: |
+        pixi run pip install install-texlive
+        pixi run install_texlive -p $HOME/.local/texlive -t 2024 --collections="-a" --package-file=paper/tex-packages.txt --update
+        echo "$HOME/.local/texlive/2024/bin/x86_64-linux" >> $GITHUB_PATH
+
+    - name: Build Paper
+      run: pixi run paper
+
+    - uses: actions/upload-artifact@v6
+      with:
+        path: build/paper.pdf
