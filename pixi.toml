@@ -103,7 +103,7 @@ ipykernel = ">=6.0.0,<7"
 sphinx-rtd-theme = ">=3.1.0, <4"
 
 [feature.sphinx-doc.tasks]
-sphinx-html = { cmd = "sphinx-build -b html docs build_docs", cwd = "." }
+sphinx-html = { cmd = "sphinx-build -b html docs build_docs", cwd = ".", depends-on = ["paper"] }
 sphinx-clean = "rm -rf build_docs"
 
 [tasks]
@@ -156,8 +156,8 @@ testpy314 = { features = ["test", "py314"] }
 prod312 = { features = ["py312"], solve-group = "prod312" }
 testpy312 = {features = ["test", "py312"] }
 
-# Doc environment only contains documentation tools, not the package dependencies
-sphinx-doc = { features = ["sphinx-doc", "py313"], solve-group = "prod" }
+# Doc environment includes both documentation tools and paper feature
+sphinx-doc = { features = ["sphinx-doc", "paper", "py313"], solve-group = "prod" }
 
 [pypi-dependencies]
 build = ">=1.4.0, <2"
