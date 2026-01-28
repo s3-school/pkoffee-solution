@@ -96,6 +96,8 @@ type-check = "ty check src"
 sphinx = ">=9.1.0,<10"
 nbsphinx = ">=0.9.8,<0.10"
 myst-parser = ">=5.0.0"
+jupyter = ">=1.0.0,<2"
+ipykernel = ">=6.0.0,<7"
 
 [feature.sphinx-doc.pypi-dependencies]
 sphinx-rtd-theme = ">=3.1.0, <4"
