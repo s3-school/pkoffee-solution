@@ -1,0 +1,14 @@
+.. include:: ../README.md
+   :parser: myst_parser.sphinx_
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API Reference:
+
+   modules
+
+.. automodule:: pkoffee
+   :members:
+   :undoc-members:
+   :show-inheritance:

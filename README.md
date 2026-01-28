@@ -106,6 +106,13 @@ pixi run lint
 pixi run format
 ```
 
+#### Documentation
+```bash
+# Build Sphinx documentation
+pixi run -e sphinx-doc sphinx-html
+# Output will be in build/html/index.html
+```
+
 ## License
 
 MIT License
