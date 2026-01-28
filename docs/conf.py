@@ -44,6 +44,9 @@ exclude_patterns = []
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 
+# Copy additional files (paper PDF) to the build directory
+html_extra_path = ["../build/paper.pdf"]
+
 # nbsphinx configuration - execute notebooks during documentation build
 nbsphinx_execute = "always"
 nbsphinx_kernel_name = "python3"

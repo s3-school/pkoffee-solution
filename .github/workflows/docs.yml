@@ -29,6 +29,12 @@ jobs:
         with:
           pixi-version: v0.63.1
 
+      - name: Install texlive
+        run: |
+          pixi run pip install install-texlive
+          pixi run install_texlive -p $HOME/.local/texlive -t 2024 --collections="-a" --package-file=paper/tex-packages.txt --update
+          echo "$HOME/.local/texlive/2024/bin/x86_64-linux" >> $GITHUB_PATH
+
       - name: Build documentation with Sphinx
         run: pixi run -e sphinx-doc sphinx-html
 
