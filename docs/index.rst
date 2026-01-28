@@ -4,11 +4,7 @@
 
 .. toctree::
    :maxdepth: 2
-   :caption: API Reference:
+   :caption: Contents:
 
+   readme
    modules
-
-.. automodule:: pkoffee
-   :members:
-   :undoc-members:
-   :show-inheritance:

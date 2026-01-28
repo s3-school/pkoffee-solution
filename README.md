@@ -93,20 +93,21 @@ pixi shell
 # use development dependencies like jupyter notebooks/ipython
 jupyterlab
 ```
-#### Tests
+
+### Tests
 ```bash
 # Run tests
 pixi run test
 ```
 
-#### Linting
+### Linting
 ```bash
 # Linting
 pixi run lint
 pixi run format
 ```
 
-#### Documentation
+### Documentation
 ```bash
 # Build Sphinx documentation
 pixi run -e sphinx-doc sphinx-html
