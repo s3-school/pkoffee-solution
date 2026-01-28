@@ -2,55 +2,52 @@ pkoffee
 =======
 
 .. automodule:: pkoffee
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   :no-index:
 
-.. toctree::
-   :maxdepth: 2
-
-   pkoffee.cli
-   pkoffee.data
-   pkoffee.fit_model
-   pkoffee.fit_model_io
-   pkoffee.log
-   pkoffee.metrics
-   pkoffee.parametric_function
-   pkoffee.productivity_analysis
-   pkoffee.visualization
+Submodules
+----------
 
 .. automodule:: pkoffee.cli
    :members:
    :undoc-members:
+   :show-inheritance:
 
 .. automodule:: pkoffee.data
    :members:
    :undoc-members:
+   :show-inheritance:
 
 .. automodule:: pkoffee.fit_model
    :members:
    :undoc-members:
+   :show-inheritance:
 
 .. automodule:: pkoffee.fit_model_io
    :members:
    :undoc-members:
+   :show-inheritance:
 
 .. automodule:: pkoffee.log
    :members:
    :undoc-members:
+   :show-inheritance:
 
 .. automodule:: pkoffee.metrics
    :members:
    :undoc-members:
+   :show-inheritance:
 
 .. automodule:: pkoffee.parametric_function
    :members:
    :undoc-members:
+   :show-inheritance:
 
 .. automodule:: pkoffee.productivity_analysis
    :members:
    :undoc-members:
+   :show-inheritance:
 
 .. automodule:: pkoffee.visualization
    :members:
    :undoc-members:
+   :show-inheritance:

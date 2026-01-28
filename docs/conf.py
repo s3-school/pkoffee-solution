@@ -24,6 +24,8 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
+    "myst_parser",
+    "nbsphinx",
 ]
 
 autodoc_default_options = {
@@ -41,3 +43,7 @@ exclude_patterns = []
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
+
+# nbsphinx configuration - execute notebooks during documentation build
+nbsphinx_execute = "always"
+nbsphinx_kernel_name = "python3"

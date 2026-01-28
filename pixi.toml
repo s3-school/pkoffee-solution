@@ -11,10 +11,6 @@ python = ["3.12.*", "3.13.*", "3.14.*"]
 
 [dependencies]
 pkoffee = { path = "." }
-ty = ">=0.0.12,<0.0.13"
-ruff = ">=0.14.12,<0.15"
-sphinx = ">=9.1.0,<10"
-nbsphinx = ">=0.9.8,<0.10"
 
 [package]
 name = "pkoffee"
@@ -89,27 +85,29 @@ depends-on = [{"task" = "run_on_snippets", "args" = ["*.ipynb", "jupyter nbconve
 [feature.dev.dependencies]
 jupyterlab = ">=4.4.3,<5"
 ruff = ">=0.14,<0.15"
+ty = ">=0.0.12,<0.0.13"
 
 [feature.dev.tasks]
 format = "ruff format"
 lint = "ruff check"
 type-check = "ty check src"
 
-[feature.doc.dependencies]
-mkdocstrings-python = ">=2.0.0,<3"
-mkdocs-material = ">=9.6.14,<10" # material brings mkdocs, markdown and pymdown-extension
+[feature.sphinx-doc.dependencies]
+sphinx = ">=9.1.0,<10"
+nbsphinx = ">=0.9.8,<0.10"
+myst-parser = ">=5.0.0"
+jupyter = ">=1.0.0,<2"
+ipykernel = ">=6.0.0,<7"
 
-[feature.doc.pypi-dependencies]
-mkdocs-api-autonav = ">=0.4.0, <0.5" # automatically generate documentation for full package
+[feature.sphinx-doc.pypi-dependencies]
+sphinx-rtd-theme = ">=3.1.0, <4"
 
-# Doc task requires to run example task before (to convert the notebooks to markdown and execute scripts to verify their validity
-# however the doc task doesn't depend on the example task, because in CI they typically run in different jobs
-[feature.doc.tasks.doc]
-args = [{"arg" = "docDir", default="htmldoc"}]
-cmd = [
-    "cp", "-r", "doc/images", "doc/doc_src/doc/images", "&&", # copy the images included in readme (included in doc) in doc source folder because mkdocs can not include files outside of src folder
-    "mkdocs", "build", "--strict", "--clean", "-f", "doc/mkdocs.yml", "-d", "../{{ docDir }}"
-]
+[feature.sphinx-doc.tasks]
+sphinx-html = { cmd = "sphinx-build -b html docs build_docs", cwd = "." }
+sphinx-clean = "rm -rf build_docs"
+
+[tasks]
+build-package = "python -m build"
 
 [feature.paper.tasks]
 outdir = { cmd = ["mkdir", "-p", "build"], outputs = ["build"] }
@@ -144,6 +142,7 @@ test = { features = ["test", "py313"], solve-group = "prod" }
 # use default for the dev environment so tasks are resolved in this environment (avoids having to specify env)
 # no need to include doc: pixi will figure the environment to use from the task if it is unique
 default = { features = ["dev", "test", "py313"], solve-group = "prod" }
+build = { solve-group = "prod" }
 
 # python 3.14 environments for testing
 prod314 = { features = ["py314"], solve-group = "prod314" }
@@ -154,7 +153,8 @@ prod312 = { features = ["py312"], solve-group = "prod312" }
 testpy312 = {features = ["test", "py312"] }
 
 # Doc environment only contains documentation tools, not the package dependencies
-doc = { features = ["doc"], no-default-feature = true }
+sphinx-doc = { features = ["sphinx-doc", "py313"], solve-group = "prod" }
 
 [pypi-dependencies]
-sphinx-rtd-theme = ">=3.1.0, <4"
+build = ">=1.4.0, <2"
+twine = ">=6.2.0, <7"

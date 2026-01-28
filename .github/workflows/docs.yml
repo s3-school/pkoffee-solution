@@ -30,12 +30,12 @@ jobs:
           pixi-version: v0.63.1
 
       - name: Build documentation with Sphinx
-        run: pixi run sphinx-build -b html source build/html
+        run: pixi run -e sphinx-doc sphinx-html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: "build/html"
+          path: "build_docs"
 
   deploy:
     needs: build
