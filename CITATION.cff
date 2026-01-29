@@ -13,6 +13,10 @@ authors:
   - family-names: Pollet
     given-names: Vincent
     email: vincent.pollet@lapp.in2p3.fr
+  - family-names: Linhoff
+    given-names: Maximilian
+  - family-names: Kosack
+    given-names: Karl
 license: MIT
 repository-code: "https://github.com/s3-school/pkoffee-solution"
 keywords:
