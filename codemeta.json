@@ -1,0 +1,89 @@
+{
+    "@context": "https://w3id.org/codemeta/3.0",
+    "applicationCategory": "SoftwareSourceCode",
+    "author": [
+        {
+            "name": "S3 School",
+            "@id": "https://github.com/s3-school",
+            "@type": "Organization"
+        },
+        {
+            "affiliation": {
+                "name": "LAPP, Univ. Savoie Mont-Blanc, CNRS",
+                "@type": "Organization"
+            },
+            "email": "thomas.vuillaume@lapp.in2p3.fr",
+            "familyName": "Vuillaume",
+            "givenName": "Thomas",
+            "@id": "https://orcid.org/0000-0002-5686-2078",
+            "@type": "Person"
+        },
+        {
+            "schema:author": "https://orcid.org/0000-0002-5686-2078",
+            "@type": "Role"
+        },
+        {
+            "affiliation": {
+                "name": "LAPP, Univ. Savoie Mont-Blanc, CNRS",
+                "@type": "Organization"
+            },
+            "familyName": "Pollet",
+            "givenName": "Vincent",
+            "@type": "Person"
+        },
+        {
+            "familyName": "Linhoff",
+            "givenName": "Maximilian",
+            "@type": "Person"
+        },
+        {
+            "familyName": "Kosack",
+            "givenName": "Karl",
+            "@type": "Person"
+        }
+    ],
+    "codeRepository": "https://github.com/s3-school/pkoffee-solution",
+    "dateCreated": "2025-12-01",
+    "dateModified": "2026-01-28",
+    "description": "- **Data Analysis**: Load and analyze coffee consumption vs productivity datasets\n- **Multiple Models**: Fit various mathematical models (quadratic, Michaelis-Menten, logistic, peak functions)\n- **Visualization**: Beautiful violin plots with model overlays using Seaborn\n- **Model Comparison**: Automatic R² scoring and ranking of models\n- **Type-Safe**: Full type hints for better IDE support and code quality\n \n",
+    "downloadUrl": "https://github.com/s3-school/pkoffee-solution/releases",
+    "funder": {
+        "name": "European Commission",
+        "@type": "Organization"
+    },
+    "license": "https://spdx.org/licenses/MIT",
+    "name": "pkoffee-solution",
+    "programmingLanguage": "Python",
+    "referencePublication": [
+        {
+            "author": [
+                {
+                    "affiliation": {
+                        "name": "LAPP, Univ. Savoie Mont-Blanc, CNRS",
+                        "@type": "Organization"
+                    },
+                    "email": "thomas.vuillaume@lapp.in2p3.fr",
+                    "familyName": "Vuillaume",
+                    "givenName": "Thomas",
+                    "@id": "https://orcid.org/0000-0002-5686-2078",
+                    "@type": "Person"
+                }
+            ],
+            "datePublished": "2026",
+            "identifier": "10.6084/m9.figshare.31049104",
+            "name": "If you use this software, please cite it as below.",
+            "url": "https://doi.org/10.6084/m9.figshare.31049104",
+            "@type": "ScholarlyArticle"
+        }
+    ],
+    "softwareRequirements": [
+        "uv_build>=0.9,<0.10.0"
+    ],
+    "codemeta:contIntegration": {
+        "@id": "https://raw.githubusercontent.com/s3-school/pkoffee-solution/main/.github/workflows/lint.yml"
+    },
+    "continuousIntegration": "https://raw.githubusercontent.com/s3-school/pkoffee-solution/main/.github/workflows/lint.yml",
+    "funding": "101129744",
+    "issueTracker": "https://github.com/s3-school/pkoffee-solution/issues",
+    "@type": "SoftwareSourceCode"
+}
