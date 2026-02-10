@@ -103,7 +103,7 @@ ipykernel = ">=6.0.0,<7"
 sphinx-rtd-theme = ">=3.1.0, <4"
 
 [feature.sphinx-doc.tasks]
-sphinx-html = { cmd = "sphinx-build -b html docs build_docs", cwd = "." }
+sphinx-html = { cmd = "sphinx-build -b html docs build_docs", cwd = ".", depends-on = ["paper"] }
 sphinx-clean = "rm -rf build_docs"
 
 [tasks]
@@ -111,7 +111,6 @@ build-package = "python -m build"
 
 [feature.paper.tasks]
 outdir = { cmd = ["mkdir", "-p", "build"], outputs = ["build"] }
-model-tex = { cmd = ["python", "paper/model_to_latex.py"], inputs = ["build/model.json", "model_to_latex.py"], depends-on = ["analyze"], outputs = ["build/model.tex"]}
 
 [feature.paper.tasks.analyze]
 cmd = ["pkoffee", "analyze", "-d", "analysis/coffee_productivity.csv", "-o", "build/model.json"]
@@ -119,16 +118,22 @@ inputs = ["analysis/coffee_productivity.csv"]
 depends-on = ["outdir"]
 outputs = ["build/model.json"]
 
+[feature.paper.tasks.model-tex]
+cmd = ["python", "paper/model_to_latex.py"]
+inputs = ["build/model.json", "paper/model_to_latex.py"]
+depends-on = ["analyze"]
+outputs = ["build/model.tex"]
+
 [feature.paper.tasks.plots]
 cmd = [
   "pkoffee", "plot",
   "-d", "analysis/coffee_productivity.csv",
   "-m", "build/model.json", 
-  "-o", "build/plot.pdf",
-  "--comparison", "build/comparison.pdf",
+  "-o", "build/plot.png",
+  "--comparison", "build/comparison.png",
 ]
 inputs = ["analysis/coffee_productivity.csv", "build/model.json"]
-outputs = ["build/plot.pdf", "build/comparison.pdf"]
+outputs = ["build/plot.png", "build/comparison.png"]
 depends-on = ["analyze"]
 
 [feature.paper.tasks.paper]
@@ -140,7 +145,6 @@ env = {TEXINPUTS = "paper:", BIBINPUTS="paper:"}
 prod = { features = ["py313", "paper"], solve-group = "prod" }
 test = { features = ["test", "py313"], solve-group = "prod" }
 # use default for the dev environment so tasks are resolved in this environment (avoids having to specify env)
-# no need to include doc: pixi will figure the environment to use from the task if it is unique
 default = { features = ["dev", "test", "py313"], solve-group = "prod" }
 build = { solve-group = "prod" }
 
@@ -152,8 +156,8 @@ testpy314 = { features = ["test", "py314"] }
 prod312 = { features = ["py312"], solve-group = "prod312" }
 testpy312 = {features = ["test", "py312"] }
 
-# Doc environment only contains documentation tools, not the package dependencies
-sphinx-doc = { features = ["sphinx-doc", "py313"], solve-group = "prod" }
+# Doc environment includes both documentation tools and paper feature
+sphinx-doc = { features = ["sphinx-doc", "paper", "py313"], solve-group = "prod" }
 
 [pypi-dependencies]
 build = ">=1.4.0, <2"
