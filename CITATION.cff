@@ -13,10 +13,13 @@ authors:
   - family-names: Pollet
     given-names: Vincent
     email: vincent.pollet@lapp.in2p3.fr
+    orcid: https://orcid.org/0009-0006-7215-9231
   - family-names: Linhoff
     given-names: Maximilian
+    orcid: https://orcid.org/0000-0001-7993-8189
   - family-names: Kosack
     given-names: Karl
+    orcid: https://orcid.org/0000-0001-8424-3621
 license: MIT
 repository-code: "https://github.com/s3-school/pkoffee-solution"
 keywords:
