@@ -28,7 +28,7 @@ jobs:
         echo "$HOME/.local/texlive/2024/bin/x86_64-linux" >> $GITHUB_PATH
 
     - name: Build Paper
-      run: pixi run paper
+      run: pixi run -e prod paper
 
     - uses: actions/upload-artifact@v6
       with:

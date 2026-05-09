@@ -11,33 +11,52 @@ def write_line(f, s="", indent=0):
     f.write(f"{indent}{s}\n")
 
 
-def write_model(f, model):
+def write_all_models(f, models_list):
     write_line(f, r"\begin{table}")
-    caption = f"Best-fit parameters of the {model['name']} model."
     write_line(f, r"\centering")
-    write_line(f, rf"\caption{{{caption}}}")
+    write_line(f, r"\caption{Best-fit parameters for all models.}")
     write_line(f, r"\vspace{0.5\baselineskip}")
-    write_line(f, r"\begin{tblr}{")
-    write_line(f, "colspec = {l r},", indent=2)
-    write_line(f, "}")
+
+    # Calculate number of columns: Model name + parameters for each model
+    num_models = len(models_list)
+    col_spec = "l" + " r" * num_models
+    write_line(f, rf"\begin{{tabular}}{{@{{\extracolsep\fill}} {col_spec} @{{\extracolsep\fill}}}}")
     write_line(f, r"\toprule", indent=2)
-    write_line(f, r"Name & Value \\", indent=2)
+
+    # Header row with model names
+    header = "Parameter"
+    for model in models_list:
+        header += f" & {model['name']}"
+    header += r" \\"
+    write_line(f, header, indent=2)
     write_line(f, r"\midrule", indent=2)
 
-    for name, value in model["params"].items():
-        name = escape_latex(name)
-        write_line(f, rf"{name} & {value:.4g} \\", indent=2)
+    # Collect all parameter names across all models
+    all_params = set()
+    for model in models_list:
+        all_params.update(model["params"].keys())
+    all_params = sorted(all_params)
+
+    # Write parameter rows
+    for param in all_params:
+        param_escaped = escape_latex(param)
+        row = param_escaped
+        for model in models_list:
+            if param in model["params"]:
+                row += f" & {model['params'][param]:.4g}"
+            else:
+                row += " & ---"
+        row += r" \\"
+        write_line(f, row, indent=2)
 
     write_line(f, r"\bottomrule", indent=2)
-    write_line(f, r"\end{tblr}")
+    write_line(f, r"\end{tabular}")
     write_line(f, r"\end{table}")
     write_line(f)
-
 
 
 with Path("build/model.json").open() as f:
     models = json.load(f)
 
 with Path("build/model.tex").open("w") as f:
-    for model in models["Models"]:
-        write_model(f, model)
+    write_all_models(f, models["Models"])
